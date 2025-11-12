@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple IPTV Player</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #channel-list {
+            width: 300px;
+            overflow-y: auto;
+            border-right: 1px solid #ccc;
+            background-color: #fff;
+            padding: 10px;
+        }
+        #player-container {
+            flex-grow: 1;
+            background-color: #000;
+        }
+        #jwplayer-container {
+            width: 100%;
+            height: 100%;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        li:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+    <script src="https://ssl.p.jwpcdn.com/player/v/8.38.10/jwplayer.js"></script>
+    <script>jwplayer.key="QybHxeEatECB7VWGt/y7fw69lOha2N4x3Es4kNK1RhDAmYzB"</script>
+</head>
+<body>
+
+    <div id="channel-list">
+        <h2>Channels</h2>
+        <ul id="channels"></ul>
+    </div>
+
+    <div id="player-container">
+        <div id="jwplayer-container"></div>
+    </div>
+
+    <script>
+        const m3uUrl = 'https://raw.githubusercontent.com/ryansnetcafe/ott-playlist/refs/heads/main/ryansnetcafe.m3u';
+        const channelList = document.getElementById('channels');
+
+        fetch(m3uUrl)
+            .then(response => response.text())
+            .then(data => {
+                const lines = data.split('\n');
+                let channels = [];
+                for (let i = 0; i < lines.length; i++) {
+                    if (lines[i].startsWith('#EXTINF:')) {
+                        const channelName = lines[i].split(',').pop();
+                        const streamUrl = lines[i + 1];
+                        channels.push({ name: channelName, url: streamUrl });
+                    }
+                }
+                return channels;
+            })
+            .then(channels => {
+                channels.forEach(channel => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = channel.name;
+                    listItem.addEventListener('click', () => {
+                        setupPlayer(channel.url);
+                    });
+                    channelList.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('Error fetching or parsing M3U playlist:', error));
+
+        function setupPlayer(streamUrl) {
+            jwplayer("jwplayer-container").setup({
+                "file": streamUrl,
+                "width": "100%",
+                "height": "100%",
+                "autostart": true,
+                "stretching": "uniform"
+            });
+        }
+    </script>
+
+</body>
+</html>
