@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shaka Player v4.16.9 - ClearKey Test</title>
+    <title>Video.js - ClearKey DASH Example</title>
 
-    <!-- Latest Shaka Player UI and CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/shaka-player.ui.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/controls.css">
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
 
     <style>
         body {
@@ -21,90 +20,72 @@
             background-color: #121212;
             color: #e0e0e0;
         }
-        #video-container {
-            width: 90%;
-            max-width: 900px;
+        .video-js {
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-        video {
-            width: 100%;
-            display: block;
-        }
-        #status {
-            margin-top: 20px;
-            font-size: 1.1em;
-            color: #ffc107;
         }
     </style>
 </head>
 <body>
 
-    <h1>Asian Food Network</h1>
-    <div data-shaka-player-container style="width: 800px;">
-         <video autoplay controls id="video"></video>
-    </div>
-    <div id="status">Initializing Player...</div>
+    <h1>Asian Food Network (Video.js)</h1>
+
+    <video
+        id="my-video"
+        class="video-js vjs-big-play-centered"
+        controls
+        preload="auto"
+        width="800"
+        height="450"
+        data-setup='{}'>
+    </video>
+
+    <!-- Video.js and required plugins -->
+    <script src="https://vjs.zencdn.net/8.10.0/video.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-dash@5.1.0/dist/videojs-dash.min.js"></script>
 
     <script>
+        // --- CONFIGURATION ---
         const manifestUri = 'https://linearjitp-playback.astro.com.my/dash-wv/linear/500/default_ott.mpd';
         const customUserAgent = 'Mozilla/5.0 (Linux; Android 14; 27821-67832-42-315-4231-233-21-43-12-1312-321-23-21-232-) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
-
-        // Key info from your playlist, converted from Base64 to Hex
-        const kid_hex = '346b9f41e2933748c8861f82932e0110';
-        const k_hex = 'cf0cffb637b81598a27bd6b0d90d65a8';
         
-        const statusDiv = document.getElementById('status');
-        const video = document.getElementById('video');
+        // Key info from your playlist
+        const kid_b64 = "NGufQeKTN0jIhh+Cky4BEA";
+        const k_b64 = "zwz/tje4FZiie9aw2Q1lqA";
 
-        async function initPlayer() {
-            // Create a Player instance.
-            const player = new shaka.Player();
-            await player.attach(video);
-            
-            // Attach the UI
-            const ui = new shaka.ui.Overlay(player, video.parentElement, video);
-            const controls = ui.getControls();
+        // --- PLAYER SETUP ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const player = videojs('my-video');
 
-            // Listen for errors from the player
-            player.addEventListener('error', onPlayerError);
-
-            // Configure the networking engine to add the custom User-Agent header
-            player.getNetworkingEngine().registerRequestFilter((type, request) => {
-                // This filter will be called for all network requests made by Shaka Player
-                request.headers['User-Agent'] = customUserAgent;
+            // --- Intercept network requests to set User-Agent ---
+            // This is the most important part for making the stream work
+            player.dash.on('xhr-hooks-ready', () => {
+                const dashXhrHooks = player.dash.xhr.hooks;
+                dashXhrHooks.beforeRequest = function (xhr) {
+                    xhr.setRequestHeader('User-Agent', customUserAgent);
+                    return xhr;
+                };
             });
 
-            // Configure the player with the ClearKey DRM credentials
-            player.configure({
-                drm: {
-                    clearKeys: {
-                        [kid_hex]: k_hex
+            // --- Set the stream source and DRM configuration ---
+            player.src({
+                src: manifestUri,
+                type: 'application/dash+xml',
+                keySystems: {
+                    'org.w3.clearkey': {
+                        'keys': [{
+                            'kty': 'oct',
+                            'k': k_b64,
+                            'kid': kid_b64
+                        }]
                     }
                 }
             });
 
-            // Try to load the manifest and start playback
-            try {
-                statusDiv.textContent = 'Loading manifest...';
-                await player.load(manifestUri);
-                statusDiv.textContent = 'Playback started!';
-                console.log('The video has now been loaded!');
-            } catch (error) {
-                // This catch block is responsible for handling network errors,
-                // such as HTTP 404s or manifest parsing failures.
-                onPlayerError({ detail: error });
-            }
-        }
-
-        function onPlayerError(event) {
-            // Log the detailed error to the console and display it on the page
-            console.error('Shaka Player Error:', event.detail);
-            statusDiv.style.color = '#e53935'; // Red color for errors
-            statusDiv.textContent = `Error: ${event.detail.message} (Code: ${event.detail.code})`;
-        }
-
-        // Wait for the page to load before starting the player
-        document.addEventListener('DOMContentLoaded', initPlayer);
+            player.ready(() => {
+                console.log('Player is ready.');
+                player.play();
+            });
+        });
     </script>
 
 </body>
