@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shaka Player - ClearKey Example</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #video-container {
+            width: 80%;
+            max-width: 800px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        video {
+            width: 100%;
+            display: block;
+        }
+    </style>
+    <!-- Shaka Player Library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/shaka-player/4.3.4/shaka-player.ui.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/shaka-player/4.3.4/controls.css">
+</head>
+<body>
+
+    <h1>Asian Food Network</h1>
+    <div id="video-container">
+        <video id="video" poster="//shaka-player-demo.appspot.com/assets/poster.jpg" controls autoplay></video>
+    </div>
+
+    <script>
+        // The manifest URI for the DASH stream.
+        const manifestUri = 'https://linearjitp-playback.astro.com.my/dash-wv/linear/500/default_ott.mpd';
+
+        // The Base64 encoded Key ID and Key from your M3U8 file.
+        const kid_b64 = "NGufQeKTN0jIhh+Cky4BEA";
+        const k_b64 = "zwz/tje4FZiie9aw2Q1lqA";
+
+        /**
+         * Converts a Base64 string to a hexadecimal string.
+         * @param {string} base64 The Base64 encoded string.
+         * @return {string} The hexadecimal representation.
+         */
+        function base64ToHex(base64) {
+            const raw = atob(base64);
+            let result = '';
+            for (let i = 0; i < raw.length; i++) {
+                const hex = raw.charCodeAt(i).toString(16);
+                result += (hex.length === 2 ? hex : '0' + hex);
+            }
+            return result.toLowerCase();
+        }
+
+        // Convert the Base64 keys to the required Hex format. [1, 17, 18]
+        const kid_hex = base64ToHex(kid_b64);
+        const k_hex = base64ToHex(k_b64);
+
+        async function initPlayer() {
+            // Get the video and container elements.
+            const video = document.getElementById('video');
+            const ui = video['ui'];
+            const controls = ui.getControls();
+            const player = controls.getPlayer();
+
+            // Configure the player with the ClearKey DRM credentials. [5, 8, 10]
+            player.configure({
+                drm: {
+                    clearKeys: {
+                        [kid_hex]: k_hex
+                    }
+                }
+            });
+
+            // Attach an error event listener.
+            player.addEventListener('error', onPlayerErrorEvent);
+            controls.addEventListener('error', onUIErrorEvent);
+
+            // Try to load the manifest and start playback.
+            try {
+                await player.load(manifestUri);
+                console.log('The video has now been loaded!');
+            } catch (error) {
+                console.error('Error loading manifest or playing video:', error);
+            }
+        }
+
+        function onPlayerErrorEvent(event) {
+            console.error('Player error:', event.detail);
+        }
+
+        function onUIErrorEvent(event) {
+            console.error('UI error:', event.detail);
+        }
+        
+        // Initialize the Shaka Player UI.
+        document.addEventListener('shaka-ui-loaded', initPlayer);
+        // Fallback for browsers without shaka-ui-loaded.
+        document.addEventListener('DOMContentLoaded', initPlayer);
+    </script>
+
+</body>
+</html>
