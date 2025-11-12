@@ -3,57 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shaka Player - Advanced Test</title>
+    <title>Shaka Player v4.16.9 - ClearKey Test</title>
+
+    <!-- Latest Shaka Player UI and CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/shaka-player.ui.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/controls.css">
+
     <style>
-        body { font-family: sans-serif; text-align: center; background-color: #222; color: white; }
-        video { width: 80%; max-width: 800px; margin-top: 20px; border: 2px solid #333; }
-        #error-log { margin-top: 20px; color: #ff6b6b; font-family: monospace; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        #video-container {
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        video {
+            width: 100%;
+            display: block;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 1.1em;
+            color: #ffc107;
+        }
     </style>
-    <!-- Use the compiled Shaka Player library (no UI) for simplicity -->
-    <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/shaka-player.compiled.min.js"></script>
 </head>
 <body>
 
-    <h1>Shaka Player Test</h1>
-    <video id="video" controls autoplay></video>
-    <div id="error-log"></div>
+    <h1>Asian Food Network</h1>
+    <div data-shaka-player-container style="width: 800px;">
+         <video autoplay controls id="video"></video>
+    </div>
+    <div id="status">Initializing Player...</div>
 
     <script>
-        // --- CONFIGURATION ---
-
-        // Original manifest URL
-        let manifestUri = 'https://linearjitp-playback.astro.com.my/dash-wv/linear/500/default_ott.mpd';
-        
-        // **CORS PROXY (IF NEEDED)**
-        // If you see a CORS error in the console, uncomment the line below to use a proxy.
-        // This is for testing only, as public proxies can be unreliable.
-        // manifestUri = 'https://cors-anywhere.herokuapp.com/' + manifestUri;
-
-        // Custom User-Agent from your M3U8 file
+        const manifestUri = 'https://linearjitp-playback.astro.com.my/dash-wv/linear/500/default_ott.mpd';
         const customUserAgent = 'Mozilla/5.0 (Linux; Android 14; 27821-67832-42-315-4231-233-21-43-12-1312-321-23-21-232-) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
 
-        // Key details (converted from Base64 to Hex)
+        // Key info from your playlist, converted from Base64 to Hex
         const kid_hex = '346b9f41e2933748c8861f82932e0110';
         const k_hex = 'cf0cffb637b81598a27bd6b0d90d65a8';
-
-        // --- PLAYER INITIALIZATION ---
+        
+        const statusDiv = document.getElementById('status');
+        const video = document.getElementById('video');
 
         async function initPlayer() {
-            const video = document.getElementById('video');
-            const player = new shaka.Player(video);
+            // Create a Player instance.
+            const player = new shaka.Player();
+            await player.attach(video);
+            
+            // Attach the UI
+            const ui = new shaka.ui.Overlay(player, video.parentElement, video);
+            const controls = ui.getControls();
 
             // Listen for errors from the player
             player.addEventListener('error', onPlayerError);
 
-            // Configure the networking engine to use the custom User-Agent
+            // Configure the networking engine to add the custom User-Agent header
             player.getNetworkingEngine().registerRequestFilter((type, request) => {
-                // We only need to modify MANIFEST and SEGMENT requests
-                if (type === shaka.net.NetworkingEngine.RequestType.MANIFEST || type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
-                    request.headers['User-Agent'] = customUserAgent;
-                }
+                // This filter will be called for all network requests made by Shaka Player
+                request.headers['User-Agent'] = customUserAgent;
             });
 
-            // Configure the DRM with ClearKeys
+            // Configure the player with the ClearKey DRM credentials
             player.configure({
                 drm: {
                     clearKeys: {
@@ -64,19 +85,22 @@
 
             // Try to load the manifest and start playback
             try {
-                console.log('Attempting to load manifest:', manifestUri);
+                statusDiv.textContent = 'Loading manifest...';
                 await player.load(manifestUri);
-                console.log('Playback started successfully!');
-            } catch (e) {
-                onPlayerError(e);
+                statusDiv.textContent = 'Playback started!';
+                console.log('The video has now been loaded!');
+            } catch (error) {
+                // This catch block is responsible for handling network errors,
+                // such as HTTP 404s or manifest parsing failures.
+                onPlayerError({ detail: error });
             }
         }
 
-        function onPlayerError(error) {
-            // Log the detailed error to the console and the screen
-            console.error('Shaka Player Error:', error.detail);
-            const errorLog = document.getElementById('error-log');
-            errorLog.innerText = `Error Code: ${error.detail.code}\nMessage: ${error.detail.message}`;
+        function onPlayerError(event) {
+            // Log the detailed error to the console and display it on the page
+            console.error('Shaka Player Error:', event.detail);
+            statusDiv.style.color = '#e53935'; // Red color for errors
+            statusDiv.textContent = `Error: ${event.detail.message} (Code: ${event.detail.code})`;
         }
 
         // Wait for the page to load before starting the player
