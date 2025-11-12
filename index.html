@@ -3,74 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shaka Player - ClearKey Example</title>
+    <title>Shaka Player - Advanced Test</title>
     <style>
-        body {
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        #video-container {
-            width: 80%;
-            max-width: 800px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        video {
-            width: 100%;
-            display: block;
-        }
+        body { font-family: sans-serif; text-align: center; background-color: #222; color: white; }
+        video { width: 80%; max-width: 800px; margin-top: 20px; border: 2px solid #333; }
+        #error-log { margin-top: 20px; color: #ff6b6b; font-family: monospace; }
     </style>
-    <!-- Shaka Player Library -->
-    <script src="https://ajax.googleapis.com/ajax/libs/shaka-player/4.3.4/shaka-player.ui.js"></script>
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/shaka-player/4.3.4/controls.css">
+    <!-- Use the compiled Shaka Player library (no UI) for simplicity -->
+    <script src="https://ajax.googleapis.com/ajax/libs/shaka-player/4.3.4/shaka-player.compiled.js"></script>
 </head>
 <body>
 
-    <h1>Asian Food Network</h1>
-    <div id="video-container">
-        <video id="video" poster="//shaka-player-demo.appspot.com/assets/poster.jpg" controls autoplay></video>
-    </div>
+    <h1>Shaka Player Test</h1>
+    <video id="video" controls autoplay></video>
+    <div id="error-log"></div>
 
     <script>
-        // The manifest URI for the DASH stream.
-        const manifestUri = 'https://linearjitp-playback.astro.com.my/dash-wv/linear/500/default_ott.mpd';
+        // --- CONFIGURATION ---
 
-        // The Base64 encoded Key ID and Key from your M3U8 file.
-        const kid_b64 = "NGufQeKTN0jIhh+Cky4BEA";
-        const k_b64 = "zwz/tje4FZiie9aw2Q1lqA";
+        // Original manifest URL
+        let manifestUri = 'https://linearjitp-playback.astro.com.my/dash-wv/linear/500/default_ott.mpd';
+        
+        // **CORS PROXY (IF NEEDED)**
+        // If you see a CORS error in the console, uncomment the line below to use a proxy.
+        // This is for testing only, as public proxies can be unreliable.
+        // manifestUri = 'https://cors-anywhere.herokuapp.com/' + manifestUri;
 
-        /**
-         * Converts a Base64 string to a hexadecimal string.
-         * @param {string} base64 The Base64 encoded string.
-         * @return {string} The hexadecimal representation.
-         */
-        function base64ToHex(base64) {
-            const raw = atob(base64);
-            let result = '';
-            for (let i = 0; i < raw.length; i++) {
-                const hex = raw.charCodeAt(i).toString(16);
-                result += (hex.length === 2 ? hex : '0' + hex);
-            }
-            return result.toLowerCase();
-        }
+        // Custom User-Agent from your M3U8 file
+        const customUserAgent = 'Mozilla/5.0 (Linux; Android 14; 27821-67832-42-315-4231-233-21-43-12-1312-321-23-21-232-) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
 
-        // Convert the Base64 keys to the required Hex format. [1, 17, 18]
-        const kid_hex = base64ToHex(kid_b64);
-        const k_hex = base64ToHex(k_b64);
+        // Key details (converted from Base64 to Hex)
+        const kid_hex = '346b9f41e2933748c8861f82932e0110';
+        const k_hex = 'cf0cffb637b81598a27bd6b0d90d65a8';
+
+        // --- PLAYER INITIALIZATION ---
 
         async function initPlayer() {
-            // Get the video and container elements.
             const video = document.getElementById('video');
-            const ui = video['ui'];
-            const controls = ui.getControls();
-            const player = controls.getPlayer();
+            const player = new shaka.Player(video);
 
-            // Configure the player with the ClearKey DRM credentials. [5, 8, 10]
+            // Listen for errors from the player
+            player.addEventListener('error', onPlayerError);
+
+            // Configure the networking engine to use the custom User-Agent
+            player.getNetworkingEngine().registerRequestFilter((type, request) => {
+                // We only need to modify MANIFEST and SEGMENT requests
+                if (type === shaka.net.NetworkingEngine.RequestType.MANIFEST || type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
+                    request.headers['User-Agent'] = customUserAgent;
+                }
+            });
+
+            // Configure the DRM with ClearKeys
             player.configure({
                 drm: {
                     clearKeys: {
@@ -79,30 +62,24 @@
                 }
             });
 
-            // Attach an error event listener.
-            player.addEventListener('error', onPlayerErrorEvent);
-            controls.addEventListener('error', onUIErrorEvent);
-
-            // Try to load the manifest and start playback.
+            // Try to load the manifest and start playback
             try {
+                console.log('Attempting to load manifest:', manifestUri);
                 await player.load(manifestUri);
-                console.log('The video has now been loaded!');
-            } catch (error) {
-                console.error('Error loading manifest or playing video:', error);
+                console.log('Playback started successfully!');
+            } catch (e) {
+                onPlayerError(e);
             }
         }
 
-        function onPlayerErrorEvent(event) {
-            console.error('Player error:', event.detail);
+        function onPlayerError(error) {
+            // Log the detailed error to the console and the screen
+            console.error('Shaka Player Error:', error.detail);
+            const errorLog = document.getElementById('error-log');
+            errorLog.innerText = `Error Code: ${error.detail.code}\nMessage: ${error.detail.message}`;
         }
 
-        function onUIErrorEvent(event) {
-            console.error('UI error:', event.detail);
-        }
-        
-        // Initialize the Shaka Player UI.
-        document.addEventListener('shaka-ui-loaded', initPlayer);
-        // Fallback for browsers without shaka-ui-loaded.
+        // Wait for the page to load before starting the player
         document.addEventListener('DOMContentLoaded', initPlayer);
     </script>
 
