@@ -3,43 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple IPTV Player</title>
+    <title>Advanced IPTV Player with Clear Key DRM</title>
     <style>
-        body {
-            font-family: sans-serif;
-            display: flex;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        #channel-list {
-            width: 300px;
-            overflow-y: auto;
-            border-right: 1px solid #ccc;
-            background-color: #fff;
-            padding: 10px;
-        }
-        #player-container {
-            flex-grow: 1;
-            background-color: #000;
-        }
-        #jwplayer-container {
-            width: 100%;
-            height: 100%;
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        li {
-            padding: 10px;
-            cursor: pointer;
-            border-bottom: 1px solid #eee;
-        }
-        li:hover {
-            background-color: #f0f0f0;
-        }
+        body { font-family: sans-serif; display: flex; height: 100vh; margin: 0; background-color: #f0f0f0; }
+        #channel-list { width: 300px; overflow-y: auto; border-right: 1px solid #ccc; background-color: #fff; padding: 10px; }
+        #player-container { flex-grow: 1; background-color: #000; }
+        #jwplayer-container { width: 100%; height: 100%; }
+        ul { list-style: none; padding: 0; margin: 0; }
+        li { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+        li:hover { background-color: #f0f0f0; }
+        .drm-channel::before { content: '🔒'; margin-right: 8px; }
     </style>
     <script src="https://ssl.p.jwpcdn.com/player/v/8.38.10/jwplayer.js"></script>
     <script>jwplayer.key="QybHxeEatECB7VWGt/y7fw69lOha2N4x3Es4kNK1RhDAmYzB"</script>
@@ -59,40 +32,102 @@
         const m3uUrl = 'https://raw.githubusercontent.com/ryansnetcafe/ott-playlist/refs/heads/main/ryansnetcafe.m3u';
         const channelList = document.getElementById('channels');
 
+        /**
+         * Converts a hexadecimal string to a Base64Url encoded string.
+         * This is required for the Web Crypto API (EME) used by the browser.
+         * @param {string} hexString The hexadecimal string to convert.
+         * @returns {string} The Base64Url encoded string.
+         */
+        function hexToBase64Url(hexString) {
+            const bytes = new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+            return btoa(String.fromCharCode.apply(null, bytes))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+
         fetch(m3uUrl)
             .then(response => response.text())
             .then(data => {
-                const lines = data.split('\n');
+                const lines = data.split('\n').map(line => line.trim()).filter(line => line);
                 let channels = [];
-                for (let i = 0; i < lines.length; i++) {
-                    if (lines[i].startsWith('#EXTINF:')) {
-                        const channelName = lines[i].split(',').pop();
-                        const streamUrl = lines[i + 1];
-                        channels.push({ name: channelName, url: streamUrl });
+                let currentChannel = {};
+
+                lines.forEach((line, index) => {
+                    if (line.startsWith('#EXTINF:')) {
+                        // If we are starting a new channel, push the previous one to the list
+                        if (currentChannel.name && currentChannel.url) {
+                            channels.push(currentChannel);
+                        }
+                        currentChannel = {
+                            name: line.split(',').pop(),
+                            url: null,
+                            keyId: null,
+                            key: null
+                        };
+                    } else if (line.startsWith('#KODIPROP:inputstream.adaptive.license_key=')) {
+                        const keyData = line.split('=').pop();
+                        const [keyId, key] = keyData.split(':');
+                        currentChannel.keyId = keyId;
+                        currentChannel.key = key;
+                    } else if (line.startsWith('http')) {
+                        currentChannel.url = line;
                     }
-                }
+
+                    // Push the last channel in the file
+                    if (index === lines.length - 1 && currentChannel.name && currentChannel.url) {
+                        channels.push(currentChannel);
+                    }
+                });
                 return channels;
             })
             .then(channels => {
                 channels.forEach(channel => {
                     const listItem = document.createElement('li');
                     listItem.textContent = channel.name;
+                    // Add a class for styling if the channel is DRM protected
+                    if (channel.keyId) {
+                        listItem.classList.add('drm-channel');
+                    }
                     listItem.addEventListener('click', () => {
-                        setupPlayer(channel.url);
+                        setupPlayer(channel);
                     });
                     channelList.appendChild(listItem);
                 });
             })
             .catch(error => console.error('Error fetching or parsing M3U playlist:', error));
 
-        function setupPlayer(streamUrl) {
-            jwplayer("jwplayer-container").setup({
-                "file": streamUrl,
-                "width": "100%",
-                "height": "100%",
-                "autostart": true,
-                "stretching": "uniform"
-            });
+        function setupPlayer(channel) {
+            const playerConfig = {
+                file: channel.url,
+                width: "100%",
+                height: "100%",
+                autostart: true,
+                stretching: "uniform"
+            };
+
+            // If the channel has a Key ID and Key from #KODIPROP, configure Clear Key DRM
+            if (channel.keyId && channel.key) {
+                console.log(`Setting up DRM for ${channel.name}`);
+                
+                const keyIdBase64Url = hexToBase64Url(channel.keyId);
+                const keyBase64Url = hexToBase64Url(channel.key);
+                
+                playerConfig.drm = {
+                    clearkey: {
+                       // We provide the keys directly in the required format
+                       keys: [{
+                           kty: 'oct',
+                           k: keyBase64Url,
+                           kid: keyIdBase64Url
+                       }]
+                    }
+                };
+            } else {
+                console.log(`Setting up non-DRM stream for ${channel.name}`);
+            }
+
+            jwplayer("jwplayer-container").setup(playerConfig);
         }
     </script>
 
