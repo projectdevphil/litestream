@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video.js - ClearKey DASH Example</title>
+    <title>Video.js - HLS Stream Example</title>
 
     <!-- Video.js CSS -->
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
@@ -27,63 +27,41 @@
 </head>
 <body>
 
-    <h1>Asian Food Network (Video.js)</h1>
+    <h1>MTV LIVE</h1>
 
     <video
-        id="my-video"
+        id="mtv-player"
         class="video-js vjs-big-play-centered"
         controls
+        autoplay
         preload="auto"
         width="800"
         height="450"
         data-setup='{}'>
     </video>
 
-    <!-- Video.js and required plugins -->
+    <!-- Video.js Library -->
     <script src="https://vjs.zencdn.net/8.10.0/video.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-dash@5.1.0/dist/videojs-dash.min.js"></script>
 
     <script>
-        // --- CONFIGURATION ---
-        const manifestUri = 'https://linearjitp-playback.astro.com.my/dash-wv/linear/500/default_ott.mpd';
-        const customUserAgent = 'Mozilla/5.0 (Linux; Android 14; 27821-67832-42-315-4231-233-21-43-12-1312-321-23-21-232-) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
-        
-        // Key info from your playlist
-        const kid_b64 = "NGufQeKTN0jIhh+Cky4BEA";
-        const k_b64 = "zwz/tje4FZiie9aw2Q1lqA";
-
-        // --- PLAYER SETUP ---
         document.addEventListener('DOMContentLoaded', () => {
-            const player = videojs('my-video');
+            // The new HLS stream URL
+            const hlsStreamUrl = 'http://131.161.83.249:8031/play/a12i/index.m3u8';
 
-            // --- Intercept network requests to set User-Agent ---
-            // This is the most important part for making the stream work
-            player.dash.on('xhr-hooks-ready', () => {
-                const dashXhrHooks = player.dash.xhr.hooks;
-                dashXhrHooks.beforeRequest = function (xhr) {
-                    xhr.setRequestHeader('User-Agent', customUserAgent);
-                    return xhr;
-                };
-            });
+            // Initialize the Video.js player
+            const player = videojs('mtv-player');
 
-            // --- Set the stream source and DRM configuration ---
+            // Set the source for the player
             player.src({
-                src: manifestUri,
-                type: 'application/dash+xml',
-                keySystems: {
-                    'org.w3.clearkey': {
-                        'keys': [{
-                            'kty': 'oct',
-                            'k': k_b64,
-                            'kid': kid_b64
-                        }]
-                    }
-                }
+                src: hlsStreamUrl,
+                type: 'application/x-mpegURL' // This is the correct MIME type for HLS
             });
 
-            player.ready(() => {
-                console.log('Player is ready.');
-                player.play();
+            // Add a listener for player errors and log them to the console
+            player.on('error', () => {
+                const error = player.error();
+                console.error('Video.js Error:', error);
+                alert(`Could not load the video. Code: ${error.code}, Message: ${error.message}`);
             });
         });
     </script>
