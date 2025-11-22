@@ -8,13 +8,13 @@
 
 :root {
     --background-color: #000000;
-    --border-radius: 15px;
+    --border-radius: 20px;
     --card-background: #1a1a1a;
     --glass-bg: rgba(25, 25, 25, 0.85);
     --glass-border: 1px solid rgba(255, 255, 255, 0.1);
     --text-color: #ffffff;
     --text-secondary: #b3b3b3;
-    --theme-color: #0064FF; /* Blue Accent Restored */
+    --theme-color: #0064FF; /* Original Blue Accent */
 }
 
 body {
@@ -176,7 +176,7 @@ header nav {
 
 .floating-menu li {
     align-items: center;
-    border-radius: 50px;
+    border-radius: 10px;
     cursor: pointer;
     display: flex;
     font-size: 0.75rem;
@@ -268,16 +268,6 @@ header nav {
     display: inline-block;
     font-size: 0.5rem;
     font-weight: 700;
-    padding: 4px 8px;
-}
-
-.slide-sponsored {
-    background-color: #333;
-    border-radius: 4px;
-    color: #fff;
-    display: inline-block;
-    font-size: 0.5rem;
-    font-weight: 500;
     padding: 4px 8px;
 }
 
@@ -380,11 +370,11 @@ header nav {
     font-size: 22px;
 }
 
-/* Player View */
+/* --- PLAYER VIEW --- */
 .player-view {
     -webkit-backdrop-filter: blur(30px);
     backdrop-filter: blur(30px);
-    background: var(--glass-bg);
+    background: var(--glass-bg); /* Glass background as requested */
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -394,14 +384,19 @@ header nav {
     padding: 20px;
     position: fixed;
     top: 0;
+    
+    /* Logic for hiding/showing */
     transform: translateY(100%);
-    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    visibility: hidden; /* Prevents clicks when hidden */
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.5s;
     width: 100%;
     z-index: 2000;
 }
 
 .player-view.active {
     transform: translateY(0);
+    visibility: visible;
+    transition-delay: 0s; /* Show immediately */
 }
 
 .player-header {
@@ -410,6 +405,7 @@ header nav {
     width: 100%;
 }
 
+/* Video Container (Shaka Friendly) */
 .video-player-container {
     aspect-ratio: 16 / 9;
     background-color: #000;
@@ -417,23 +413,19 @@ header nav {
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     margin: 0 auto;
     max-width: 960px;
-    overflow: hidden;
+    width: 100%;
     position: relative;
-    width: 100%;
+    overflow: hidden; /* Ensures rounded corners clip video */
 }
 
-.shaka-player-container {
-    font-family: "Netflix Sans", sans-serif;
-}
-
-.shaka-video-container {
-    font-family: "Netflix Sans", sans-serif;
-    width: 100%;
-    height: 100%;
-}
-
+/* Targets Shaka's internal controls to apply blue theme */
 .shaka-controls-button-panel .material-icons-round {
-    color: var(--theme-color);
+    color: var(--theme-color) !important;
+}
+
+/* Ensure range/seek bar (if visible) matches theme */
+.shaka-range-element {
+    color: var(--theme-color) !important;
 }
 
 .player-info {
@@ -449,8 +441,9 @@ header nav {
     margin: 0;
 }
 
+/* This is the Status Text (Now Playing) */
 .player-info-left p {
-    color: var(--theme-color); /* Highlighted Now Playing */
+    color: var(--theme-color);
     font-size: 0.8rem;
     font-weight: 600;
     margin: 5px 0 0 0;
@@ -507,6 +500,7 @@ header nav {
     height: 35px;
     object-fit: contain;
     width: 45px;
+    display: block; /* Ensure it displays */
 }
 
 .minimized-info h4 {
@@ -529,34 +523,6 @@ header nav {
     align-items: center;
     display: flex;
     gap: 10px;
-}
-
-.live-sensor-mini {
-    color: var(--theme-color);
-    font-size: 20px;
-}
-
-.icon-link-mini {
-    display: flex;
-    align-items: center;
-}
-
-/* Footer */
-.site-footer {
-    color: #666;
-    margin-top: 40px;
-    padding: 30px 20px;
-    text-align: center;
-}
-
-.footer-content p {
-    font-size: 0.6rem;
-    margin: 5px 0;
-}
-
-.footer-brand {
-    color: var(--theme-color);
-    font-weight: 800;
 }
 
 /* Utilities */
