@@ -232,7 +232,7 @@ header nav {
 }
 
 .slide-overlay {
-    background: radial-gradient(circle at top right, transparent 0%, black 95%);
+    background: radial-gradient(circle at top right, transparent 35%, black 100%);
     inset: 0;
     position: absolute;
 }
@@ -469,7 +469,7 @@ header nav {
     justify-content: space-between;
     left: 20px;
     opacity: 0;
-    padding: 30px 15px;
+    padding: 20px 15px;
     position: fixed;
     right: 20px;
     transform: translateY(20px);
