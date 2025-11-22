@@ -45,10 +45,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!floatingMenu) return;
         floatingMenu.innerHTML = `
         <ul>
-            <li><a href="#"><span class="material-symbols-rounded">info</span> About Us</a></li>
-            <li><a href="#"><span class="material-symbols-rounded">quiz</span> FAQ</a></li>
-            <li><a href="#"><span class="material-symbols-rounded">shield</span> Privacy Policy</a></li>
-            <li><a href="#"><span class="material-symbols-rounded">gavel</span> Terms of Service</a></li>
+            <li><a href="/litestream/about-us"><span class="material-symbols-rounded">info</span> About Us</a></li>
+            <li><a href="/litestream/faq"><span class="material-symbols-rounded">quiz</span> FAQ</a></li>
+            <li><a href="/litestream/privacy"><span class="material-symbols-rounded">shield</span> Privacy Policy</a></li>
+            <li><a href="/litestream/terms"><span class="material-symbols-rounded">gavel</span> Terms of Service</a></li>
+            <li><a href="/stream-tester"><span class="material-symbols-rounded">tabs</span> Stream Tester</a></li>            
         </ul>`;
     };
 
