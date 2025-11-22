@@ -28,25 +28,6 @@ async function initApp() {
     let currentlyDisplayedCount = 0;
     let activeStream = null;
 
-    // --- Helper from Stream Tester: Decode Base64 keys if needed ---
-    function base64UrlToHex(base64Url) {
-        try {
-            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            while (base64.length % 4) {
-                base64 += '=';
-            }
-            const raw = atob(base64);
-            let hex = '';
-            for (let i = 0; i < raw.length; i++) {
-                hex += raw.charCodeAt(i).toString(16).padStart(2, '0');
-            }
-            return hex;
-        } catch (e) {
-            console.error('Failed to decode base64 string:', base64Url, e);
-            return null;
-        }
-    }
-
     async function initShaka() {
         shaka.Polyfill.installAll();
 
@@ -61,7 +42,6 @@ async function initApp() {
         const player = new shaka.Player(video);
         const ui = new shaka.ui.Overlay(player, videoContainer, video);
 
-        // Configure Shaka for better streaming stability
         player.configure({
             streaming: {
                 bufferingGoal: 60,
@@ -89,25 +69,20 @@ async function initApp() {
             await initShaka();
         }
 
-        // Unload previous stream completely
+        // Unload previous stream
         await shakaPlayer.unload();
 
         const config = {
             drm: {
-                servers: {} 
+                servers: {},
+                clearKeys: {}
             }
         };
 
-        // Logic from Stream Tester: Handle ClearKey properly
-        if (stream.licenseType === 'org.w3.clearkey' && stream.k1 && stream.k2) {
-             config.drm.clearKeys = {
-                [stream.k1]: stream.k2
-            };
+        // Simplified DRM logic using the new JSON structure
+        if (stream.k1 && stream.k2) {
+             config.drm.clearKeys[stream.k1] = stream.k2;
         } 
-        // Handle Widevine or License Servers if present
-        else if (stream.licenseType && stream.licenseKey && !stream.k1) {
-            config.drm.servers[stream.licenseType] = stream.licenseKey;
-        }
 
         shakaPlayer.configure(config);
 
@@ -115,114 +90,26 @@ async function initApp() {
             console.log("Loading stream:", stream.name);
             await shakaPlayer.load(stream.manifestUri);
             const video = document.getElementById('video');
-            video.play().catch(e => console.warn("Auto-play failed, waiting for user interaction", e)); 
+            video.play().catch(e => console.warn("Auto-play prevented:", e)); 
         } catch (e) {
             console.error('Error loading video:', e);
         }
     }
 
-    async function fetchAndProcessM3U() {
-        const M3U_URL = "https://raw.githubusercontent.com/projectdevphil/iptv-playlist/refs/heads/new-path/visionlite/index.m3u";
+    // NEW: Fetch channels from the separate file
+    async function fetchChannels() {
         allSelectors.spinner.style.display = 'flex';
-        
         try {
-            const response = await fetch(M3U_URL);
-            if (!response.ok) throw new Error('Network response was not ok');
-            const m3uText = await response.text();
+            // Fetching the .js file which contains JSON data
+            const response = await fetch('assets/database/getChannels.js');
+            if (!response.ok) throw new Error(`Failed to fetch channels: ${response.status}`);
             
-            // --- ADVANCED PARSING LOGIC (From Stream Tester) ---
-            const lines = m3uText.trim().split('\n');
-            const parsedStreams = [];
-            
-            let currentInfo = {};
-            let currentDrm = {}; 
-
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-
-                // 1. Check for License Type
-                if (line.startsWith('#KODIPROP:inputstream.adaptive.license_type=')) {
-                    const type = line.split('=')[1]?.trim();
-                    if (type.toLowerCase() === 'clearkey') {
-                        currentDrm.licenseType = 'org.w3.clearkey';
-                    } else {
-                        currentDrm.licenseType = type;
-                    }
-                } 
-
-                // 2. Check for License Key (Handles JSON, URL, and Key:Kid format)
-                else if (line.startsWith('#KODIPROP:inputstream.adaptive.license_key=')) {
-                    const keyData = line.split('=').slice(1).join('=');
-                    
-                    // A. Handle JSON keys (e.g. {"keys":...})
-                    if (keyData.trim().startsWith('{')) {
-                        try {
-                            const parsedJson = JSON.parse(keyData);
-                            if (parsedJson.keys && parsedJson.keys.length > 0) {
-                                const keyInfo = parsedJson.keys[0];
-                                if (keyInfo.k && keyInfo.kid) {
-                                    currentDrm.k2 = base64UrlToHex(keyInfo.k);
-                                    currentDrm.k1 = base64UrlToHex(keyInfo.kid);
-                                    currentDrm.licenseType = 'org.w3.clearkey';
-                                }
-                            }
-                        } catch (e) {
-                            console.error('Failed to parse license_key JSON:', keyData, e);
-                        }
-                    }
-                    // B. Handle License URL (Widevine/Playready)
-                    else if (keyData.includes('http://') || keyData.includes('https://')) {
-                        currentDrm.licenseKey = keyData.trim();
-                    } 
-                    // C. Handle Standard Hex ID:Key
-                    else {
-                        const keyParts = keyData.split(':');
-                        if (keyParts.length === 2 && keyParts[0].trim() && keyParts[1].trim()) {
-                            currentDrm.k1 = keyParts[0].trim(); // kid
-                            currentDrm.k2 = keyParts[1].trim(); // key
-                            currentDrm.licenseType = 'org.w3.clearkey';
-                        }
-                    }
-                }
-
-                // 3. Check for Channel Info
-                else if (line.startsWith('#EXTINF:')) {
-                    const infoPart = line.substring(line.indexOf(':') + 1);
-                    const name = infoPart.split(',').pop().trim();
-                    const logoMatch = line.match(/tvg-logo="([^"]*)"/);
-                    const groupMatch = line.match(/group-title="([^"]*)"/);
-                    
-                    currentInfo = { 
-                        name, 
-                        logo: logoMatch ? logoMatch[1] : '/assets/favicon.png', 
-                        group: groupMatch ? groupMatch[1] : 'General' 
-                    };
-                }
-
-                // 4. Check for Stream URL
-                else if (line.startsWith('http')) {
-                    parsedStreams.push({
-                        name: currentInfo.name || 'Unknown Channel',
-                        logo: currentInfo.logo,
-                        group: currentInfo.group,
-                        manifestUri: line,
-                        // Merge DRM info
-                        licenseType: currentDrm.licenseType,
-                        k1: currentDrm.k1,
-                        k2: currentDrm.k2,
-                        licenseKey: currentDrm.licenseKey
-                    });
-                    // Reset buffers
-                    currentInfo = {};
-                    currentDrm = {};
-                }
-            }
-
+            const channels = await response.json();
             allSelectors.spinner.style.display = 'none';
-            return parsedStreams;
+            return channels;
 
         } catch (error) {
-            console.error("Failed to load playlist:", error);
+            console.error("Failed to load channels:", error);
             allSelectors.spinner.style.display = 'none';
             allSelectors.channelListingsContainer.innerHTML = '<p style="padding:20px; text-align:center; color:#666;">Failed to load channels.</p>';
             return [];
@@ -293,7 +180,6 @@ async function initApp() {
         e.stopPropagation();
         if (shakaPlayer) {
             shakaPlayer.unload();
-            // Visual reset
             document.getElementById('video').removeAttribute('src'); 
             document.getElementById('video').load();
         }
@@ -382,7 +268,8 @@ async function initApp() {
     allSelectors.minimizedPlayer.addEventListener('click', restorePlayer);
     allSelectors.exitBtn.addEventListener('click', closePlayer);
 
-    allStreams = await fetchAndProcessM3U();
+    // Initialize channels
+    allStreams = await fetchChannels();
     currentFilteredStreams = [...allStreams];
     renderChannels();
 }
