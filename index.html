@@ -5,10 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Phillite - Free Filipino IPTV</title>
     <meta name="description" content="Phillite is a free streaming service for every Filipino.">
-    <meta name="theme-color" content="#0064FF">
+    <meta name="theme-color" content="#000000">
     <link rel="icon" type="image/png" href="/assets/favicon.png" />
+    
+    <!-- Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,200,0..1,0" />
+    
+    <!-- Shaka Player CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/controls.min.css">
+    
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -17,7 +22,6 @@
             <a href="/" class="logo">phillite</a>
         </div>
         <nav>
-            <!-- Expandable Search -->
             <div class="search-container" id="search-container">
                 <input type="text" id="search-input" placeholder="Search...">
                 <button id="search-toggle" class="icon-link">
@@ -50,14 +54,14 @@
                 <div class="player-info">
                     <div class="player-info-left">
                         <h3 id="player-channel-name">Select a Channel</h3>
-                        <p id="player-channel-category">Live TV</p>
+                        <!-- Changed ID content default to Now Playing -->
+                        <p id="player-channel-status">Now Playing</p>
                     </div>
                     <div class="live-indicator"><span class="material-symbols-outlined">sensors</span>LIVE</div>
                 </div>
             </div>
 
             <div class="content-container">
-                <!-- Featured Slider (Original Layout) -->
                 <section id="featured-slider" class="featured-slider">
                     <div class="slider">
                          <div class="slide active">
@@ -85,15 +89,13 @@
                     </div>
                 </section>
         
-                <!-- Category Pills Removed -->
-        
-                <h2 id="channel-list-header" class="section-header">Now Playing</h2>
+                <!-- CHANGED: Header back to "Channels" -->
+                <h2 id="channel-list-header" class="section-header">Channels</h2>
         
                 <section id="channel-listings" class="channel-listings">
                     <div class="spinner-container" id="spinner">
                         <div class="spinner"></div>
                     </div>
-                    <!-- List injected via JS -->
                     <div class="channel-list"></div>
                 </section>
         
@@ -111,13 +113,14 @@
         </div>
     </main>
     
-    <!-- Minimized Player (Fixed Bottom) -->
+    <!-- Minimized Player -->
     <div id="minimized-player" class="minimized-player">
         <div class="minimized-player-left">
             <img id="minimized-player-logo" src="" alt="Channel Logo" class="minimized-logo" onerror="this.style.display='none'">
             <div class="minimized-info">
                 <h4 id="minimized-player-name">Channel Name</h4>
-                <p id="minimized-player-status">Playing</p>
+                <!-- Changed to specific ID for JS update -->
+                <p id="minimized-player-status">Now Playing</p>
             </div>
         </div>
         <div class="minimized-player-right">
@@ -126,7 +129,7 @@
         </div>
     </div>
 
-    <!-- Shaka Player JS (Compiled + UI) -->
+    <!-- Shaka Player JS -->
     <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/shaka-player.ui.js"></script>
     <script src="js/script.js"></script>
 </body>
