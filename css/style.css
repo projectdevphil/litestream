@@ -49,7 +49,7 @@ button {
     padding: 0;
 }
 
-/* --- Header (Original Layout) --- */
+/* Header */
 header {
     align-items: center;
     backdrop-filter: none;
@@ -106,7 +106,7 @@ header nav {
     background: rgba(255,255,255,0.1);
 }
 
-/* Expandable Search */
+/* Search */
 .search-container {
     display: flex;
     align-items: center;
@@ -140,7 +140,7 @@ header nav {
     margin-right: 5px;
 }
 
-/* --- Floating Menu (Original Layout) --- */
+/* Floating Menu */
 .floating-menu {
     backdrop-filter: blur(20px);
     background: var(--glass-bg);
@@ -191,7 +191,7 @@ header nav {
     width: 100%;
 }
 
-/* --- Featured Slider (Original Layout) --- */
+/* Featured Slider */
 .featured-slider {
     margin: 20px;
     position: relative;
@@ -300,7 +300,7 @@ header nav {
     border-radius: 10px;
 }
 
-/* --- Channel List (Original Layout) --- */
+/* Channel List */
 .section-header {
     font-size: 1rem;
     font-weight: 700;
@@ -376,7 +376,7 @@ header nav {
     font-size: 22px;
 }
 
-/* --- Player View (Slide Up - Original Layout) --- */
+/* Player View */
 .player-view {
     -webkit-backdrop-filter: blur(30px);
     backdrop-filter: blur(30px);
@@ -418,16 +418,12 @@ header nav {
     width: 100%;
 }
 
-/* Shaka UI Overrides */
 .shaka-video-container {
     width: 100%;
     height: 100%;
 }
 .shaka-controls-button-panel .material-icons-round {
     color: var(--theme-color);
-}
-.shaka-seek-bar-container {
-    /* Hide seek bar for Live TV mostly */
 }
 
 .player-info {
@@ -444,8 +440,9 @@ header nav {
 }
 
 .player-info-left p {
-    color: var(--text-secondary);
+    color: var(--theme-color); /* Highlighted Now Playing */
     font-size: 0.8rem;
+    font-weight: 600;
     margin: 5px 0 0 0;
 }
 
@@ -458,7 +455,7 @@ header nav {
     gap: 5px;
 }
 
-/* --- Minimized Player (Original Layout) --- */
+/* Minimized Player */
 .minimized-player {
     -webkit-backdrop-filter: blur(20px);
     align-items: center;
@@ -512,9 +509,10 @@ header nav {
 }
 
 .minimized-info p {
-    color: var(--text-secondary);
+    color: var(--theme-color);
     font-size: 0.65rem;
     margin: 0;
+    font-weight: 500;
 }
 
 .minimized-player-right {
@@ -533,7 +531,7 @@ header nav {
     align-items: center;
 }
 
-/* --- Footer --- */
+/* Footer */
 .site-footer {
     color: #666;
     margin-top: 40px;
@@ -551,7 +549,7 @@ header nav {
     font-weight: 800;
 }
 
-/* --- Utilities --- */
+/* Utilities */
 .spinner-container {
     display: flex;
     justify-content: center;
