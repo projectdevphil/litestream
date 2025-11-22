@@ -371,7 +371,7 @@ header nav {
     font-size: 0.85rem;
 }
 
-.channel-info-right .material-symbols-outlined {
+.channel-info-right .material-symbols-rounded {
     color: var(--theme-color);
     font-size: 22px;
 }
