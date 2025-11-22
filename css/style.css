@@ -451,7 +451,7 @@ header nav {
 
 .live-indicator {
     align-items: center;
-    color: #ff0000;
+    color: var(--theme-color);
     display: flex;
     font-size: 0.9rem;
     font-weight: 400;
