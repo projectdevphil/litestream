@@ -525,6 +525,22 @@ header nav {
     gap: 10px;
 }
 
+.site-footer {
+    color: #666;
+    margin-top: 40px;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.footer-content p {
+    font-size: 0.6rem;
+    margin: 5px 0;
+}
+
+.footer-brand {
+    font-weight: 800;
+}
+
 /* Utilities */
 .spinner-container {
     display: flex;
