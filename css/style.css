@@ -418,6 +418,10 @@ header nav {
     overflow: hidden; /* Ensures rounded corners clip video */
 }
 
+.shaka-controls-container {
+  font-family: 'Neflix Sans', sans-serif;
+}
+
 /* Targets Shaka's internal controls to apply blue theme */
 .shaka-controls-button-panel .material-icons-round {
     color: var(--theme-color) !important;
