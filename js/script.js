@@ -63,10 +63,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Initialize UI overlay (Standard Position)
             try {
                 ui = new shaka.ui.Overlay(player, playerWrapper, videoElement);
-                ui.configure({
-                    addSeekBar: false,
-                    controlPanelElements: ['play_pause', 'mute', 'volume', 'fullscreen', 'overflow_menu']
-                });
             } catch (e) {
                 console.warn("UI init failed", e);
                 videoElement.controls = true;
