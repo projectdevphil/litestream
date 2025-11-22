@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     
     // --- CONFIGURATION ---
-    // Ensure this path matches where you saved your file. 
-    // It is highly recommended to rename getChannels.js to channels.json
+    // IMPORTANT: Ensure this file exists and is a valid JSON array
     const CHANNELS_DB_PATH = 'assets/database/channels.json'; 
     const CHANNELS_PER_PAGE = 50;
 
@@ -21,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const loadMoreBtn = document.getElementById("load-more-btn");
     const channelHeader = document.getElementById("channel-list-header");
     
-    // Player Selectors
+    // Player UI Selectors
     const playerView = document.getElementById('player-view');
     const videoElement = document.getElementById('video');
     const playerWrapper = document.getElementById('video-container'); 
@@ -29,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const minimizedPlayer = document.getElementById('minimized-player');
     const exitBtn = document.getElementById('exit-player-btn');
 
-    // Player Info Selectors
+    // Player Text Selectors
     const mainPlayerName = document.getElementById('player-channel-name');
     const mainPlayerStatus = document.getElementById('player-channel-status');
     const miniPlayerName = document.getElementById('minimized-player-name');
@@ -45,43 +44,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentlyDisplayedCount = 0;
     const originalTitle = document.title;
 
-    // --- HELPER FUNCTIONS ---
+    // --- HELPER: CHECK BROWSER SUPPORT ---
     const isDesktop = () => window.innerWidth >= 1024;
 
-    const setVideoPoster = () => {
-        if (!videoElement) return;
-        // Set a generic poster or specific one based on device
-        videoElement.poster = isDesktop() ? 'assets/desktop-poster.png' : 'assets/mobile-poster.png';
-    };
-
-    // --- SHAKA PLAYER INITIALIZATION ---
+    // --- 1. INITIALIZE SHAKA PLAYER ---
     const initPlayer = async () => {
-        // Check if Shaka is loaded
-        if (!shaka) {
-            console.error("Shaka Player library not loaded!");
-            alert("Error: Video Player library missing.");
-            return false;
-        }
-
-        shaka.Polyfill.installAll();
+        // Install Polyfills (Crucial for some browsers)
+        shaka.polyfill.installAll();
 
         if (shaka.Player.isBrowserSupported()) {
             player = new shaka.Player(videoElement);
             
-            // Initialize Shaka UI Overlay
-            // We wrap this in try-catch in case UI library is missing
+            // Create UI Overlay
+            // This enables the play/volume/fullscreen buttons on top of the video
             try {
                 ui = new shaka.ui.Overlay(player, playerWrapper, videoElement);
                 ui.configure({
-                    addSeekBar: false, // Live TV usually doesn't need seeking
+                    addSeekBar: false, // Live TV usually doesn't need a seek bar
                     controlPanelElements: ['play_pause', 'mute', 'volume', 'fullscreen', 'overflow_menu']
                 });
             } catch (e) {
-                console.warn("Shaka UI failed to initialize, falling back to native controls", e);
+                console.warn("Shaka UI failed, using native controls", e);
                 videoElement.controls = true;
             }
 
-            // Configure Network & Buffer logic for slower connections
+            // Configure Network Logic (Matches your Alternative Site's stability)
             player.configure({
                 streaming: {
                     bufferingGoal: 30,
@@ -97,121 +84,124 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             player.addEventListener('error', onPlayerError);
-            console.log("Shaka Player Initialized");
+            console.log("Shaka Player Initialized Successfully");
             return true;
         } else {
             console.error('Browser not supported!');
-            alert("Your browser does not support this video player.");
+            alert("Your browser does not support the video player.");
             return false;
         }
     };
 
     const onPlayerError = (event) => {
         const error = event.detail;
-        console.error('Player Error Code:', error.code, error);
+        console.error('Shaka Error Code:', error.code, error);
         
-        // DRM Errors (6000-6999)
+        let errorMsg = "Stream Offline or Error";
+        
+        // DRM / Key Errors
         if (error.code >= 6000 && error.code < 7000) {
-            mainPlayerStatus.textContent = "Error: DRM Key Expired or Invalid";
-            if(miniPlayerStatus) miniPlayerStatus.textContent = "DRM Error";
-        } else {
-            mainPlayerStatus.textContent = "Stream Offline / Connection Error";
-            if(miniPlayerStatus) miniPlayerStatus.textContent = "Offline";
+            errorMsg = "DRM Key Expired";
+            console.warn("The keys (k1/k2) for this channel may be invalid.");
         }
+        
+        mainPlayerStatus.textContent = errorMsg;
+        mainPlayerStatus.style.color = "#ff4444"; // Red for error
     };
 
-    // --- OPEN PLAYER LOGIC (FIXED) ---
+    // --- 2. OPEN PLAYER (THE CORE LOGIC) ---
     const openPlayer = async (stream) => {
         activeStream = stream;
+        console.log("Opening Channel:", stream.name);
 
-        // 1. UPDATE UI IMMEDIATELY (Before loading video)
-        // This fixes the "nothing happens" issue
+        // STEP A: SHOW THE UI IMMEDIATELY
+        // This ensures "something happens" when you click
         if (playerView) {
             playerView.classList.add('active');
-            // Ensure minimized player is hidden when opening main player
+            // Hide mini player if it was open
             if (minimizedPlayer) minimizedPlayer.classList.remove('active');
         }
 
-        // 2. Update Text Info
+        // STEP B: UPDATE TEXT INFO
         mainPlayerName.textContent = stream.name;
-        mainPlayerStatus.textContent = "Loading Stream...";
+        mainPlayerStatus.textContent = "Connecting...";
         mainPlayerStatus.style.color = "var(--theme-color)";
         document.title = `${stream.name} - Phillite`;
 
-        // Update Mini Player Info
         if (miniPlayerName) miniPlayerName.textContent = stream.name;
-        if (miniPlayerStatus) miniPlayerStatus.textContent = "Loading...";
-        if (miniPlayerLogo) {
-            miniPlayerLogo.src = stream.logo || 'assets/favicon.png';
-            miniPlayerLogo.style.display = 'block';
-        }
+        if (miniPlayerLogo) miniPlayerLogo.src = stream.logo || 'assets/favicon.png';
 
-        // 3. Initialize Player Instance if it doesn't exist
+        // STEP C: INIT PLAYER IF MISSING
         if (!player) {
             const success = await initPlayer();
-            if (!success) return;
+            if (!success) return; // Stop if browser unsupported
         }
 
-        if (ui) ui.setEnabled(true);
+        // STEP D: CONFIGURE DRM (CLEARKEY)
+        // This matches the logic from your working site
+        const config = {
+            drm: {
+                servers: {},
+                clearKeys: {}
+            }
+        };
 
+        // Check if channel has Keys (k1/k2)
+        if (stream.k1 && stream.k2) {
+            console.log(`Applying DRM Keys for ${stream.name}`);
+            // Your JSON has Hex keys, so we apply them directly
+            config.drm.clearKeys[stream.k1] = stream.k2;
+        } else {
+            console.log("No DRM Keys found, attempting clear playback.");
+        }
+
+        player.configure(config);
+
+        // STEP E: LOAD & PLAY
         try {
-            // 4. Unload previous stream
+            // Enable UI
+            if (ui) ui.setEnabled(true);
+            
+            // Unload previous
             await player.unload();
 
-            // 5. Configure DRM (ClearKeys)
-            // This maps the k1/k2 from your JSON to the player
-            const config = {
-                drm: {
-                    servers: {},
-                    clearKeys: {}
-                }
-            };
-
-            if (stream.k1 && stream.k2) {
-                config.drm.clearKeys[stream.k1] = stream.k2;
-            }
-
-            player.configure(config);
-
-            console.log(`Attempting to load: ${stream.name}`);
-
-            // 6. Load the Stream
+            // Load new manifest
             await player.load(stream.manifestUri);
             
-            // 7. Play
-            await videoElement.play();
+            // Attempt to play
+            const playPromise = videoElement.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(e => {
+                    console.warn("Autoplay prevented by browser. User must click play.", e);
+                });
+            }
             
-            // 8. Success UI Update
+            // Success UI
             mainPlayerStatus.textContent = "Now Playing";
-            if(miniPlayerStatus) miniPlayerStatus.textContent = "Live";
+            mainPlayerStatus.style.color = "#00ff00"; // Green for success
 
         } catch (e) {
-            console.error('Load Error:', e);
-            mainPlayerStatus.textContent = "Stream Failed to Load";
-            mainPlayerStatus.style.color = "red";
-            
-            // Don't close the player automatically so user sees the error
+            console.error('Load failed:', e);
+            mainPlayerStatus.textContent = "Failed to Load";
+            mainPlayerStatus.style.color = "#ff4444";
+            onPlayerError({ detail: e });
         }
     };
 
-    // --- PLAYER CONTROLS ---
+    // --- 3. UI CONTROLS (Minimize, Close, etc) ---
     
-    // Minimize: Hides full screen, shows bottom bar
     const minimizePlayer = (e) => {
         if(e) e.stopPropagation();
-        
         if (playerView && playerView.classList.contains('active')) {
             playerView.classList.remove('active');
-            // Small delay for animation
             setTimeout(() => {
                 if (minimizedPlayer) minimizedPlayer.classList.add('active');
             }, 300);
         }
     };
 
-    // Restore: Hides bottom bar, shows full screen
     const restorePlayer = (e) => {
-        // Ignore if clicking the close button inside the mini player
+        // Don't restore if clicking the 'X' button
         if (e.target.closest('#exit-player-btn')) return;
         
         if (minimizedPlayer && minimizedPlayer.classList.contains('active')) {
@@ -220,30 +210,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Close: Stops everything
     const closePlayer = async (e) => {
         if(e) e.stopPropagation();
 
-        if (player) {
-            await player.unload();
-        }
+        if (player) await player.unload();
         
         activeStream = null;
         document.title = originalTitle;
 
-        // Hide all player UIs
+        // Hide all players
         if (playerView) playerView.classList.remove('active');
         if (minimizedPlayer) minimizedPlayer.classList.remove('active');
         
-        // Reset Text
+        // Reset UI text
         setTimeout(() => {
             mainPlayerName.textContent = 'Select a Channel';
             mainPlayerStatus.textContent = 'Idle';
+            mainPlayerStatus.style.color = "var(--text-secondary)";
         }, 300);
     };
 
-
-    // --- DATA FETCHING ---
+    // --- 4. DATA FETCHING ---
     async function fetchChannels() {
         spinner.style.display = 'flex';
         try {
@@ -258,14 +245,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             spinner.style.display = 'none';
             channelListingsContainer.innerHTML = `
                 <div style="text-align:center; padding:20px; color: #ff4444;">
-                    <p>Unable to load channels.</p>
-                    <small>${error.message}</small>
+                    <p>Unable to load channel list.</p>
+                    <p>Please ensure <strong>assets/database/channels.json</strong> exists.</p>
                 </div>`;
             return [];
         }
     }
 
-    // --- RENDERING ---
+    // --- 5. RENDER LIST ---
     const renderChannels = (reset = false) => {
         if (reset) {
             channelListingsContainer.innerHTML = '';
@@ -275,7 +262,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const channelsToRender = currentFilteredStreams.slice(currentlyDisplayedCount, currentlyDisplayedCount + CHANNELS_PER_PAGE);
 
         if(channelsToRender.length === 0 && reset) {
-            channelListingsContainer.innerHTML = '<p style="text-align:center; width:100%; padding:20px; color:gray;">No channels found.</p>';
+            channelListingsContainer.innerHTML = '<p style="text-align:center; padding:20px;">No channels found.</p>';
             loadMoreContainer.style.display = 'none';
             return;
         }
@@ -284,7 +271,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const item = document.createElement('div');
             item.className = 'channel-list-item';
             
-            // Use a transparent placeholder if logo fails
             const logoSrc = stream.logo || 'assets/favicon.png';
             
             item.innerHTML = `
@@ -296,14 +282,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <span class="material-symbols-rounded">play_circle</span>
                 </div>`;
 
-            // CLICK EVENT
+            // CLICK EVENT -> TRIGGERS PLAYER
             item.addEventListener('click', () => openPlayer(stream));
+            
             channelListingsContainer.appendChild(item);
         });
 
         currentlyDisplayedCount += channelsToRender.length;
         
-        // Handle Load More Button Visibility
         if (currentlyDisplayedCount >= currentFilteredStreams.length) {
             loadMoreContainer.style.display = 'none';
         } else {
@@ -311,7 +297,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // --- SEARCH ---
+    // --- 6. SETUP SEARCH, MENU, SLIDER ---
     const setupSearch = () => {
         searchToggle.addEventListener('click', () => {
             searchContainer.classList.toggle('active');
@@ -339,7 +325,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderChannels(true);
     };
 
-    // --- SLIDER ---
     const setupSlider = () => {
         const slider = document.querySelector(".slider");
         if (!slider) return;
@@ -347,7 +332,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const dots = slider.parentElement.querySelectorAll(".slider-nav .dot");
         
         if(slides.length === 0) return;
-
         let currentSlide = 0;
         let slideInterval = setInterval(nextSlide, 6000);
 
@@ -359,8 +343,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentSlide = (currentSlide + 1) % slides.length; 
             goToSlide(currentSlide); 
         }
-        
-        // Dot click events
         dots.forEach((dot, index) => {
             dot.addEventListener("click", () => {
                 currentSlide = index;
@@ -371,47 +353,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    // --- EVENT LISTENERS ---
-    
-    // Header scroll effect
+    // --- 7. EVENT LISTENERS ---
     window.addEventListener("scroll", () => {
-        header.classList.toggle("scrolled", window.scrollY > 10);
+        if(header) header.classList.toggle("scrolled", window.scrollY > 10);
     });
 
-    // Floating Menu
-    const renderMenu = () => {
-        if(floatingMenu) {
-            floatingMenu.innerHTML = `
-            <ul>
-                <li><a href="#"><span class="material-symbols-rounded">info</span> About</a></li>
-                <li><a href="#"><span class="material-symbols-rounded">bug_report</span> Report Issue</a></li>
-            </ul>`;
-        }
-
-        if(menuBtn) {
-            menuBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                floatingMenu.classList.toggle("active");
-            });
-        }
-        document.addEventListener("click", () => {
-            if(floatingMenu) floatingMenu.classList.remove("active");
+    // Menu Logic
+    if(floatingMenu && menuBtn) {
+        floatingMenu.innerHTML = `
+        <ul>
+            <li><a href="#"><span class="material-symbols-rounded">info</span> About</a></li>
+            <li><a href="#"><span class="material-symbols-rounded">bug_report</span> Report Issue</a></li>
+        </ul>`;
+        menuBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            floatingMenu.classList.toggle("active");
         });
-    };
+        document.addEventListener("click", () => floatingMenu.classList.remove("active"));
+    }
 
-    // Player Buttons
+    // Player Button Listeners
     if(minimizeBtn) minimizeBtn.addEventListener('click', minimizePlayer);
     if(minimizedPlayer) minimizedPlayer.addEventListener('click', restorePlayer);
     if(exitBtn) exitBtn.addEventListener('click', closePlayer);
     if(loadMoreBtn) loadMoreBtn.addEventListener('click', () => renderChannels(false));
 
-    // --- INITIALIZATION SEQUENCE ---
+    // --- 8. START APP ---
     setupSearch();
-    renderMenu();
     setupSlider();
-    setVideoPoster();
 
-    // Fetch and Render
+    // Load Data
     allStreams = await fetchChannels();
     if (allStreams && allStreams.length > 0) {
         currentFilteredStreams = [...allStreams];
