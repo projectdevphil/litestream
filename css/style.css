@@ -419,13 +419,15 @@ header nav {
 }
 
 .shaka-player-container {
-  font-family: "Netflix Sans", sans-serif !important;
+    font-family: "Netflix Sans", sans-serif;
 }
 
 .shaka-video-container {
+    font-family: "Netflix Sans", sans-serif;
     width: 100%;
     height: 100%;
 }
+
 .shaka-controls-button-panel .material-icons-round {
     color: var(--theme-color);
 }
