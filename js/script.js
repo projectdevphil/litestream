@@ -1,9 +1,12 @@
-window.addEventListener('load', () => {
+// Define init function for Shaka
+async function initApp() {
+    
     const allSelectors = {
+        header: document.querySelector("header"),
         menuBtn: document.getElementById("menu-btn"),
         floatingMenu: document.getElementById("floating-menu"),
-        searchWrapper: document.getElementById("search-wrapper"),
-        searchBtn: document.getElementById("search-btn"),
+        searchContainer: document.getElementById("search-container"),
+        searchToggle: document.getElementById("search-toggle"),
         searchInput: document.getElementById("search-input"),
         channelListingsContainer: document.querySelector(".channel-list"),
         spinner: document.getElementById("spinner"),
@@ -16,73 +19,71 @@ window.addEventListener('load', () => {
         channelHeader: document.getElementById("channel-list-header")
     };
 
-    let playerInstance = null;
+    let shakaPlayer = null;
+    let uiOverlay = null;
     let allStreams = [];
     let currentFilteredStreams = [];
-    const CHANNELS_PER_PAGE = 20;
+    const CHANNELS_PER_PAGE = 50;
     let currentlyDisplayedCount = 0;
+    let activeStream = null;
 
-    // --- Restored Slider Logic ---
-    const setupSlider = () => {
-        const slider = document.querySelector(".slider");
-        if (!slider) return;
-        const slides = slider.querySelectorAll(".slide");
-        const dots = slider.parentElement.querySelectorAll(".slider-nav .dot");
-        let currentSlide = 0;
-        let slideInterval = setInterval(nextSlide, 5000);
+    // --- Shaka Player Setup ---
+    async function initShaka() {
+        // Install built-in polyfills
+        shaka.Polyfill.installAll();
 
-        function goToSlide(n) { 
-            slides.forEach((s, i) => s.classList.toggle("active", i === n)); 
-            dots.forEach((d, i) => d.classList.toggle("active", i === n)); 
+        if (!shaka.Player.isBrowserSupported()) {
+            console.error('Browser not supported!');
+            return;
         }
+
+        const video = document.getElementById('video');
+        const videoContainer = document.querySelector('[data-shaka-player-container]');
         
-        function nextSlide() { 
-            currentSlide = (currentSlide + 1) % slides.length; 
-            goToSlide(currentSlide); 
-        }
-        
-        dots.forEach((dot, index) => {
-            dot.addEventListener("click", () => {
-                currentSlide = index;
-                goToSlide(index);
-                clearInterval(slideInterval);
-                slideInterval = setInterval(nextSlide, 5000);
-            });
+        // Initialize the UI
+        const ui = new shaka.ui.Overlay(shakaPlayer, videoContainer, video);
+        uiOverlay = ui;
+        const controls = ui.getControls();
+        shakaPlayer = controls.getPlayer();
+
+        // Configure standard error handling
+        shakaPlayer.addEventListener('error', (event) => {
+            console.error('Error code', event.detail.code, 'object', event.detail);
         });
-    };
+    }
 
-    // --- Restored Menu Logic ---
-    const renderMenu = () => {
-        allSelectors.floatingMenu.innerHTML = `
-        <ul>
-            <li><a href="/home/about-us"><span class="material-symbols-outlined">info</span> About Us</a></li>
-            <li><a href="/home/faq"><span class="material-symbols-outlined">quiz</span> FAQ</a></li>
-            <li><a href="/home/privacy-policy"><span class="material-symbols-outlined">shield</span> Privacy Policy</a></li>
-            <li><a href="/home/terms-of-service"><span class="material-symbols-outlined">gavel</span> Terms of Service</a></li>
-        </ul>`;
+    async function loadStream(stream) {
+        if (!shakaPlayer) await initShaka();
 
-        allSelectors.floatingMenu.querySelectorAll("li").forEach(e => e.addEventListener("click", t => {
-            const n = e.querySelector("a");
-            if (n) { 
-                // Prevent default for demo purposes as pages don't exist
-                t.preventDefault(); 
-                console.log("Navigating to:", n.href);
+        // Configure DRM if present
+        const config = {
+            drm: {
+                servers: {} 
             }
-        }));
-        
-        allSelectors.menuBtn.addEventListener("click", e => { e.stopPropagation(); allSelectors.floatingMenu.classList.toggle("active"); });
-        document.addEventListener("click", () => allSelectors.floatingMenu.classList.remove("active"));
-        allSelectors.floatingMenu.addEventListener("click", e => e.stopPropagation());
-    };
+        };
 
-    // --- M3U Parsing with DRM Support ---
+        if (stream.drm && stream.drm.clearkey) {
+            config.drm.clearKeys = stream.drm.clearkey;
+        }
+
+        shakaPlayer.configure(config);
+
+        try {
+            await shakaPlayer.load(stream.manifestUri);
+            console.log('The video has now been loaded!');
+        } catch (e) {
+            console.error('Error code', e.code, 'object', e);
+        }
+    }
+
+    // --- M3U Parsing with DRM (ClearKey) Extraction ---
     async function fetchAndProcessM3U() {
         const M3U_URL = "https://raw.githubusercontent.com/projectdevphil/iptv-playlist/refs/heads/new-path/visionlite/index.m3u";
         allSelectors.spinner.style.display = 'flex';
         
         try {
             const response = await fetch(M3U_URL);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            if (!response.ok) throw new Error('Network response was not ok');
             const m3uText = await response.text();
             
             const lines = m3uText.trim().split('\n');
@@ -94,9 +95,10 @@ window.addEventListener('load', () => {
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
 
-                // Parse DRM Props (Kodi format)
+                // Parse Kodi DRM props
                 if (line.startsWith('#KODIPROP:inputstream.adaptive.license_key=')) {
                     const keyString = line.split('license_key=')[1];
+                    // Usually keyID:Key
                     if (keyString && keyString.includes(':')) {
                         const [kid, key] = keyString.split(':');
                         currentDrm = {
@@ -107,30 +109,27 @@ window.addEventListener('load', () => {
                     }
                 }
 
-                // Parse Info
                 if (line.startsWith('#EXTINF:')) {
                     const infoPart = line.substring(line.indexOf(':') + 1);
                     const name = infoPart.split(',').pop().trim();
-                    
                     const logoMatch = line.match(/tvg-logo="([^"]*)"/);
-                    const logo = logoMatch ? logoMatch[1] : '';
-
                     const groupMatch = line.match(/group-title="([^"]*)"/);
-                    const group = groupMatch ? groupMatch[1] : 'General';
-
-                    currentInfo = { name, logo, group };
+                    
+                    currentInfo = { 
+                        name, 
+                        logo: logoMatch ? logoMatch[1] : '/assets/favicon.png', 
+                        group: groupMatch ? groupMatch[1] : 'General' 
+                    };
                 }
 
-                // Parse URL
                 if (line.startsWith('http')) {
                     parsedStreams.push({
                         name: currentInfo.name || 'Unknown Channel',
                         logo: currentInfo.logo,
                         group: currentInfo.group,
                         manifestUri: line,
-                        drm: currentDrm 
+                        drm: currentDrm
                     });
-                    
                     currentInfo = {};
                     currentDrm = null;
                 }
@@ -142,63 +141,90 @@ window.addEventListener('load', () => {
         } catch (error) {
             console.error("Failed to load playlist:", error);
             allSelectors.spinner.style.display = 'none';
-            allSelectors.channelListingsContainer.innerHTML = '<p style="text-align:center; padding:20px; color: #666;">Unable to load channels.</p>';
+            allSelectors.channelListingsContainer.innerHTML = '<p style="padding:20px; text-align:center; color:#666;">Failed to load channels.</p>';
             return [];
         }
     }
 
-    // --- Rendering ---
+    // --- UI Rendering ---
     const renderChannels = (reset = false) => {
         if (reset) {
             allSelectors.channelListingsContainer.innerHTML = '';
             currentlyDisplayedCount = 0;
         }
 
-        const channelsToRender = currentFilteredStreams.slice(
-            currentlyDisplayedCount, 
-            currentlyDisplayedCount + CHANNELS_PER_PAGE
-        );
-
-        if (channelsToRender.length === 0 && currentlyDisplayedCount === 0) {
-             allSelectors.channelListingsContainer.innerHTML = '<p style="text-align:center; width:100%; padding:20px; color: #666;">No channels found.</p>';
-             allSelectors.loadMoreContainer.style.display = 'none';
-             return;
-        }
+        const channelsToRender = currentFilteredStreams.slice(currentlyDisplayedCount, currentlyDisplayedCount + CHANNELS_PER_PAGE);
 
         channelsToRender.forEach(stream => {
             const item = document.createElement('div');
             item.className = 'channel-list-item';
+            
             item.innerHTML = `
                 <div class="channel-info-left">
-                    <img src="${stream.logo}" alt="${stream.name}" class="channel-logo" onerror="this.style.opacity='0.3'">
+                    <img src="${stream.logo}" alt="${stream.name}" class="channel-logo" onerror="this.src='/assets/favicon.png'; this.style.opacity='0.5'">
                     <span class="channel-name">${stream.name}</span>
                 </div>
                 <div class="channel-info-right">
-                    <span class="material-symbols-outlined">play_circle</span>
+                    <span class="material-symbols-outlined">play_arrow</span>
                 </div>`;
-            
+
             item.addEventListener('click', () => openPlayer(stream));
             allSelectors.channelListingsContainer.appendChild(item);
         });
 
         currentlyDisplayedCount += channelsToRender.length;
-        
-        if (currentlyDisplayedCount >= currentFilteredStreams.length) {
-            allSelectors.loadMoreContainer.style.display = 'none';
-        } else {
-            allSelectors.loadMoreContainer.style.display = 'block';
-        }
+        allSelectors.loadMoreContainer.style.display = currentlyDisplayedCount < currentFilteredStreams.length ? 'block' : 'none';
     };
 
-    // --- Search Logic ---
+    // --- Interaction Logic ---
+    const openPlayer = (stream) => {
+        activeStream = stream;
+        loadStream(stream);
+
+        document.getElementById("player-channel-name").textContent = stream.name;
+        document.getElementById("player-channel-category").textContent = stream.group;
+        
+        // Minimize info
+        document.getElementById("minimized-player-name").textContent = stream.name;
+        const miniLogo = document.getElementById("minimized-player-logo");
+        miniLogo.src = stream.logo;
+        miniLogo.style.display = 'block';
+
+        allSelectors.playerView.classList.add("active");
+        allSelectors.minimizedPlayer.classList.remove("active");
+    };
+
+    const minimizePlayer = () => {
+        allSelectors.playerView.classList.remove("active");
+        setTimeout(() => {
+            allSelectors.minimizedPlayer.classList.add("active");
+        }, 300);
+    };
+
+    const restorePlayer = (e) => {
+        if(e.target.closest('#exit-player-btn')) return;
+        allSelectors.minimizedPlayer.classList.remove("active");
+        allSelectors.playerView.classList.add("active");
+    };
+
+    const closePlayer = (e) => {
+        e.stopPropagation();
+        if (shakaPlayer) {
+            shakaPlayer.unload();
+        }
+        allSelectors.minimizedPlayer.classList.remove("active");
+        allSelectors.playerView.classList.remove("active");
+        activeStream = null;
+    };
+
     const setupSearch = () => {
-        allSelectors.searchBtn.addEventListener('click', () => {
-            allSelectors.searchWrapper.classList.toggle('active');
-            if(allSelectors.searchWrapper.classList.contains('active')) {
+        allSelectors.searchToggle.addEventListener('click', () => {
+            allSelectors.searchContainer.classList.toggle('active');
+            if(allSelectors.searchContainer.classList.contains('active')) {
                 allSelectors.searchInput.focus();
             } else {
                 allSelectors.searchInput.value = '';
-                performSearch(''); 
+                performSearch('');
             }
         });
 
@@ -213,89 +239,69 @@ window.addEventListener('load', () => {
             allSelectors.channelHeader.textContent = `Search Results (${currentFilteredStreams.length})`;
         } else {
             currentFilteredStreams = [...allStreams];
-            allSelectors.channelHeader.textContent = "Channels";
+            allSelectors.channelHeader.textContent = "Now Playing";
         }
         renderChannels(true);
     };
 
-    // --- Player Logic (JW Player) ---
-    const initJWPlayer = () => {
-        if (!playerInstance) {
-            playerInstance = jwplayer("jw-player-container");
-        }
-    };
+    const renderMenu = () => {
+        allSelectors.floatingMenu.innerHTML = `
+        <ul>
+            <li><a href="#"><span class="material-symbols-outlined">info</span> About Us</a></li>
+            <li><a href="#"><span class="material-symbols-outlined">quiz</span> FAQ</a></li>
+            <li><a href="#"><span class="material-symbols-outlined">shield</span> Privacy Policy</a></li>
+            <li><a href="#"><span class="material-symbols-outlined">gavel</span> Terms of Service</a></li>
+        </ul>`;
 
-    const openPlayer = (stream) => {
-        initJWPlayer();
-
-        const playlistItem = {
-            file: stream.manifestUri,
-            title: stream.name,
-            image: stream.logo,
-            type: "dash", 
-            autostart: true,
-            mute: false
-        };
-
-        if (stream.drm) {
-            playlistItem.drm = stream.drm;
-        }
-
-        playerInstance.setup({
-            playlist: [playlistItem],
-            width: "100%",
-            height: "100%",
-            autostart: true,
-            stretching: "uniform",
+        allSelectors.menuBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            allSelectors.floatingMenu.classList.toggle("active");
         });
-
-        document.getElementById("player-channel-name").textContent = stream.name;
-        document.getElementById("player-channel-group").textContent = stream.group || 'Live TV';
-        
-        allSelectors.playerView.classList.add("active");
-        allSelectors.minimizedPlayer.classList.remove("active");
-
-        document.getElementById("minimized-player-name").textContent = stream.name;
-        const miniLogo = document.getElementById("minimized-player-logo");
-        miniLogo.src = stream.logo;
-        miniLogo.style.display = stream.logo ? 'block' : 'none';
+        document.addEventListener("click", () => allSelectors.floatingMenu.classList.remove("active"));
     };
 
-    const minimizePlayer = () => {
-        allSelectors.playerView.classList.remove("active");
-        allSelectors.minimizedPlayer.classList.add("active");
-    };
+    const setupSlider = () => {
+        const slider = document.querySelector(".slider");
+        if (!slider) return;
+        const slides = slider.querySelectorAll(".slide");
+        const dots = slider.parentElement.querySelectorAll(".slider-nav .dot");
+        let currentSlide = 0;
+        let slideInterval = setInterval(nextSlide, 5000);
 
-    const restorePlayer = (e) => {
-        if(e.target.closest('#exit-player-btn')) return;
-        allSelectors.minimizedPlayer.classList.remove("active");
-        allSelectors.playerView.classList.add("active");
-    };
-
-    const closePlayer = (e) => {
-        e.stopPropagation();
-        if (playerInstance) {
-            playerInstance.stop();
+        function goToSlide(n) { 
+            slides.forEach((s, i) => s.classList.toggle("active", i === n)); 
+            dots.forEach((d, i) => d.classList.toggle("active", i === n)); 
         }
-        allSelectors.minimizedPlayer.classList.remove("active");
-        allSelectors.playerView.classList.remove("active");
+        function nextSlide() { 
+            currentSlide = (currentSlide + 1) % slides.length; 
+            goToSlide(currentSlide); 
+        }
+        dots.forEach((dot, index) => {
+            dot.addEventListener("click", () => {
+                currentSlide = index;
+                goToSlide(index);
+                clearInterval(slideInterval);
+                slideInterval = setInterval(nextSlide, 5000);
+            });
+        });
     };
 
-    // --- Initialization ---
-    const init = async () => {
-        setupSlider();
-        renderMenu();
-        setupSearch();
-        
-        allStreams = await fetchAndProcessM3U();
-        currentFilteredStreams = [...allStreams];
-        renderChannels();
+    // --- Main Init ---
+    window.addEventListener("scroll", () => allSelectors.header.classList.toggle("scrolled", window.scrollY > 10));
+    
+    setupSearch();
+    renderMenu();
+    setupSlider();
+    initShaka(); // Init Shaka empty first
 
-        allSelectors.loadMoreBtn.addEventListener('click', () => renderChannels(false));
-        allSelectors.minimizeBtn.addEventListener('click', minimizePlayer);
-        allSelectors.minimizedPlayer.addEventListener('click', restorePlayer);
-        allSelectors.exitBtn.addEventListener('click', closePlayer);
-    };
+    allSelectors.loadMoreBtn.addEventListener('click', () => renderChannels(false));
+    allSelectors.minimizeBtn.addEventListener('click', minimizePlayer);
+    allSelectors.minimizedPlayer.addEventListener('click', restorePlayer);
+    allSelectors.exitBtn.addEventListener('click', closePlayer);
 
-    init();
-});
+    allStreams = await fetchAndProcessM3U();
+    currentFilteredStreams = [...allStreams];
+    renderChannels();
+}
+
+window.addEventListener('load', initApp);
