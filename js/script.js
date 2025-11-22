@@ -1,4 +1,5 @@
-// Define init function for Shaka
+window.addEventListener('load', initApp);
+
 async function initApp() {
     
     const allSelectors = {
@@ -27,9 +28,7 @@ async function initApp() {
     let currentlyDisplayedCount = 0;
     let activeStream = null;
 
-    // --- Shaka Player Setup ---
     async function initShaka() {
-        // Install built-in polyfills
         shaka.Polyfill.installAll();
 
         if (!shaka.Player.isBrowserSupported()) {
@@ -40,22 +39,22 @@ async function initApp() {
         const video = document.getElementById('video');
         const videoContainer = document.querySelector('[data-shaka-player-container]');
         
-        // Initialize the UI
-        const ui = new shaka.ui.Overlay(shakaPlayer, videoContainer, video);
+        const player = new shaka.Player(video);
+        const ui = new shaka.ui.Overlay(player, videoContainer, video);
+        
+        shakaPlayer = player;
         uiOverlay = ui;
-        const controls = ui.getControls();
-        shakaPlayer = controls.getPlayer();
 
-        // Configure standard error handling
         shakaPlayer.addEventListener('error', (event) => {
-            console.error('Error code', event.detail.code, 'object', event.detail);
+            console.error('Shaka Error code', event.detail.code, 'object', event.detail);
         });
     }
 
     async function loadStream(stream) {
-        if (!shakaPlayer) await initShaka();
+        if (!shakaPlayer) {
+            await initShaka();
+        }
 
-        // Configure DRM if present
         const config = {
             drm: {
                 servers: {} 
@@ -69,14 +68,15 @@ async function initApp() {
         shakaPlayer.configure(config);
 
         try {
+            console.log("Loading stream:", stream.name);
             await shakaPlayer.load(stream.manifestUri);
-            console.log('The video has now been loaded!');
+            const video = document.getElementById('video');
+            video.play(); 
         } catch (e) {
-            console.error('Error code', e.code, 'object', e);
+            console.error('Error loading video:', e);
         }
     }
 
-    // --- M3U Parsing with DRM (ClearKey) Extraction ---
     async function fetchAndProcessM3U() {
         const M3U_URL = "https://raw.githubusercontent.com/projectdevphil/iptv-playlist/refs/heads/new-path/visionlite/index.m3u";
         allSelectors.spinner.style.display = 'flex';
@@ -95,10 +95,8 @@ async function initApp() {
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
 
-                // Parse Kodi DRM props
                 if (line.startsWith('#KODIPROP:inputstream.adaptive.license_key=')) {
                     const keyString = line.split('license_key=')[1];
-                    // Usually keyID:Key
                     if (keyString && keyString.includes(':')) {
                         const [kid, key] = keyString.split(':');
                         currentDrm = {
@@ -146,7 +144,6 @@ async function initApp() {
         }
     }
 
-    // --- UI Rendering ---
     const renderChannels = (reset = false) => {
         if (reset) {
             allSelectors.channelListingsContainer.innerHTML = '';
@@ -165,7 +162,7 @@ async function initApp() {
                     <span class="channel-name">${stream.name}</span>
                 </div>
                 <div class="channel-info-right">
-                    <span class="material-symbols-outlined">play_arrow</span>
+                    <span class="material-symbols-outlined">sensors</span>
                 </div>`;
 
             item.addEventListener('click', () => openPlayer(stream));
@@ -176,16 +173,22 @@ async function initApp() {
         allSelectors.loadMoreContainer.style.display = currentlyDisplayedCount < currentFilteredStreams.length ? 'block' : 'none';
     };
 
-    // --- Interaction Logic ---
     const openPlayer = (stream) => {
         activeStream = stream;
         loadStream(stream);
 
+        // Update Player View Labels
         document.getElementById("player-channel-name").textContent = stream.name;
-        document.getElementById("player-channel-category").textContent = stream.group;
         
-        // Minimize info
+        // CHANGE: Set status to "Now Playing" always
+        document.getElementById("player-channel-status").textContent = "Now Playing";
+        
+        // Update Minimized Player Labels
         document.getElementById("minimized-player-name").textContent = stream.name;
+        
+        // CHANGE: Set status to "Now Playing" always
+        document.getElementById("minimized-player-status").textContent = "Now Playing";
+
         const miniLogo = document.getElementById("minimized-player-logo");
         miniLogo.src = stream.logo;
         miniLogo.style.display = 'block';
@@ -239,7 +242,8 @@ async function initApp() {
             allSelectors.channelHeader.textContent = `Search Results (${currentFilteredStreams.length})`;
         } else {
             currentFilteredStreams = [...allStreams];
-            allSelectors.channelHeader.textContent = "Now Playing";
+            // CHANGE: Reset to Channels
+            allSelectors.channelHeader.textContent = "Channels";
         }
         renderChannels(true);
     };
@@ -286,13 +290,11 @@ async function initApp() {
         });
     };
 
-    // --- Main Init ---
     window.addEventListener("scroll", () => allSelectors.header.classList.toggle("scrolled", window.scrollY > 10));
     
     setupSearch();
     renderMenu();
     setupSlider();
-    initShaka(); // Init Shaka empty first
 
     allSelectors.loadMoreBtn.addEventListener('click', () => renderChannels(false));
     allSelectors.minimizeBtn.addEventListener('click', minimizePlayer);
@@ -303,5 +305,3 @@ async function initApp() {
     currentFilteredStreams = [...allStreams];
     renderChannels();
 }
-
-window.addEventListener('load', initApp);
