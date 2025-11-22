@@ -162,7 +162,7 @@ async function initApp() {
                     <span class="channel-name">${stream.name}</span>
                 </div>
                 <div class="channel-info-right">
-                    <span class="material-symbols-outlined">sensors</span>
+                    <span class="material-symbols-rounded">sensors</span>
                 </div>`;
 
             item.addEventListener('click', () => openPlayer(stream));
@@ -251,10 +251,10 @@ async function initApp() {
     const renderMenu = () => {
         allSelectors.floatingMenu.innerHTML = `
         <ul>
-            <li><a href="#"><span class="material-symbols-outlined">info</span> About Us</a></li>
-            <li><a href="#"><span class="material-symbols-outlined">quiz</span> FAQ</a></li>
-            <li><a href="#"><span class="material-symbols-outlined">shield</span> Privacy Policy</a></li>
-            <li><a href="#"><span class="material-symbols-outlined">gavel</span> Terms of Service</a></li>
+            <li><a href="#"><span class="material-symbols-rounded">info</span> About Us</a></li>
+            <li><a href="#"><span class="material-symbols-rounded">quiz</span> FAQ</a></li>
+            <li><a href="#"><span class="material-symbols-rounded">shield</span> Privacy Policy</a></li>
+            <li><a href="#"><span class="material-symbols-rounded">gavel</span> Terms of Service</a></li>
         </ul>`;
 
         allSelectors.menuBtn.addEventListener("click", (e) => {
