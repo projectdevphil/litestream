@@ -8,7 +8,7 @@
 
 :root {
     --background-color: #000000;
-    --border-radius: 20px;
+    --border-radius: 15px;
     --card-background: #1a1a1a;
     --glass-bg: rgba(25, 25, 25, 0.85);
     --glass-border: 1px solid rgba(255, 255, 255, 0.1);
@@ -176,7 +176,7 @@ header nav {
 
 .floating-menu li {
     align-items: center;
-    border-radius: 10px;
+    border-radius: 50px;
     cursor: pointer;
     display: flex;
     font-size: 0.75rem;
@@ -191,7 +191,7 @@ header nav {
 .floating-menu li a {
     align-items: center;
     display: flex;
-    gap: 12px;
+    gap: 10px;
     width: 100%;
 }
 
