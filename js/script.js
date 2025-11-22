@@ -1,136 +1,245 @@
-window.addEventListener('load', initApp);
-
-async function initApp() {
+document.addEventListener('DOMContentLoaded', async () => {
     
-    const allSelectors = {
-        header: document.querySelector("header"),
-        menuBtn: document.getElementById("menu-btn"),
-        floatingMenu: document.getElementById("floating-menu"),
-        searchContainer: document.getElementById("search-container"),
-        searchToggle: document.getElementById("search-toggle"),
-        searchInput: document.getElementById("search-input"),
-        channelListingsContainer: document.querySelector(".channel-list"),
-        spinner: document.getElementById("spinner"),
-        playerView: document.getElementById("player-view"),
-        minimizeBtn: document.getElementById("minimize-player-btn"),
-        minimizedPlayer: document.getElementById("minimized-player"),
-        exitBtn: document.getElementById("exit-player-btn"),
-        loadMoreContainer: document.getElementById("load-more-container"),
-        loadMoreBtn: document.getElementById("load-more-btn"),
-        channelHeader: document.getElementById("channel-list-header")
-    };
+    // --- SELECTORS ---
+    const header = document.querySelector("header");
+    const menuBtn = document.getElementById("menu-btn");
+    const floatingMenu = document.getElementById("floating-menu");
+    const searchContainer = document.getElementById("search-container");
+    const searchToggle = document.getElementById("search-toggle");
+    const searchInput = document.getElementById("search-input");
+    const channelListingsContainer = document.querySelector(".channel-list");
+    const spinner = document.getElementById("spinner");
+    const loadMoreContainer = document.getElementById("load-more-container");
+    const loadMoreBtn = document.getElementById("load-more-btn");
+    const channelHeader = document.getElementById("channel-list-header");
+    
+    // Player Selectors
+    const playerView = document.getElementById('player-view');
+    const videoElement = document.getElementById('video');
+    const playerWrapper = document.getElementById('video-container'); // Wrapper for Shaka UI
+    const minimizeBtn = document.getElementById('minimize-player-btn');
+    const minimizedPlayer = document.getElementById('minimized-player');
+    const exitBtn = document.getElementById('exit-player-btn');
 
-    let shakaPlayer = null;
-    let uiOverlay = null;
+    // --- STATE VARIABLES ---
+    let player = null;
+    let ui = null;
     let allStreams = [];
     let currentFilteredStreams = [];
+    let activeStream = null;
+    
     const CHANNELS_PER_PAGE = 50;
     let currentlyDisplayedCount = 0;
-    let activeStream = null;
+    const originalTitle = "Phillite - Free Lite Access Philippines IPTV";
 
-    async function initShaka() {
+    // --- HELPER FUNCTIONS ---
+    const isDesktop = () => window.innerWidth >= 1024;
+
+    const setVideoPoster = () => {
+        if (!videoElement) return;
+        // You can customize these paths or remove this function if you don't have these images
+        if (isDesktop()) {
+            videoElement.poster = 'assets/desktop-poster.png'; 
+        } else {
+            videoElement.poster = 'assets/attention.png';
+        }
+    };
+
+    // --- PLAYER INITIALIZATION (From Alternative Site) ---
+    const initPlayer = async () => {
         shaka.Polyfill.installAll();
 
-        if (!shaka.Player.isBrowserSupported()) {
-            console.error('Browser not supported!');
-            return;
-        }
-
-        const video = document.getElementById('video');
-        const videoContainer = document.getElementById('video-container');
-        
-        const player = new shaka.Player(video);
-        const ui = new shaka.ui.Overlay(player, videoContainer, video);
-
-        player.configure({
-            streaming: {
-                bufferingGoal: 60,
-                rebufferingGoal: 15,
-                bufferBehind: 30,
-                retryParameters: {
-                    maxAttempts: 5,
-                    baseDelay: 1000,
-                    backoffFactor: 2,
-                    fuzzFactor: 0.5,
-                }
-            }
-        });
-        
-        shakaPlayer = player;
-        uiOverlay = ui;
-
-        shakaPlayer.addEventListener('error', (event) => {
-            console.error('Shaka Error code', event.detail.code, 'object', event.detail);
-        });
-    }
-
-    async function loadStream(stream) {
-        if (!shakaPlayer) {
-            await initShaka();
-        }
-
-        // Unload previous stream
-        await shakaPlayer.unload();
-
-        const config = {
-            drm: {
-                servers: {},
-                clearKeys: {}
-            }
-        };
-
-        // Simplified DRM logic using the new JSON structure
-        if (stream.k1 && stream.k2) {
-             config.drm.clearKeys[stream.k1] = stream.k2;
-        } 
-
-        shakaPlayer.configure(config);
-
-        try {
-            console.log("Loading stream:", stream.name);
-            await shakaPlayer.load(stream.manifestUri);
-            const video = document.getElementById('video');
-            video.play().catch(e => console.warn("Auto-play prevented:", e)); 
-        } catch (e) {
-            console.error('Error loading video:', e);
-        }
-    }
-
-    // NEW: Fetch channels from the separate file
-    async function fetchChannels() {
-        allSelectors.spinner.style.display = 'flex';
-        try {
-            // Fetching the .js file which contains JSON data
-            const response = await fetch('assets/database/getChannels.js');
-            if (!response.ok) throw new Error(`Failed to fetch channels: ${response.status}`);
+        if (shaka.Player.isBrowserSupported()) {
+            player = new shaka.Player(videoElement);
             
-            const channels = await response.json();
-            allSelectors.spinner.style.display = 'none';
-            return channels;
+            // Initialize Shaka UI Overlay
+            ui = new shaka.ui.Overlay(player, playerWrapper, videoElement);
 
+            // Configure UI
+            ui.configure({
+                addSeekBar: false, // Hide seek bar for live TV
+                controlPanelElements: ['play_pause', 'mute', 'volume', 'fullscreen', 'overflow_menu']
+            });
+
+            // Configure Player Network Logic
+            player.configure({
+                streaming: {
+                    bufferingGoal: 60,
+                    rebufferingGoal: 15,
+                    bufferBehind: 30,
+                    retryParameters: {
+                        maxAttempts: 5,
+                        baseDelay: 1000,
+                        backoffFactor: 2,
+                        fuzzFactor: 0.5,
+                    }
+                }
+            });
+
+            player.addEventListener('error', onError);
+            console.log("Shaka Player Initialized");
+        } else {
+            console.error('Browser not supported!');
+            alert("Browser not supported");
+        }
+    };
+
+    const onError = (event) => {
+        console.error('Player Error', event.detail);
+        // Optional: Add logic here to handle key expiration
+        if(event.detail.code === 6007 || event.detail.code === 6008) {
+             console.warn("DRM License invalid or expired.");
+        }
+    };
+
+    // --- OPEN PLAYER LOGIC (Merged) ---
+    const openPlayer = async (stream) => {
+        activeStream = stream;
+
+        // 1. Prepare UI
+        if (videoElement) videoElement.style.display = 'block';
+        
+        // 2. Initialize Player if needed
+        if (!player) await initPlayer();
+        if (ui) ui.setEnabled(true);
+
+        try {
+            // Unload previous content
+            await player.unload();
+
+            // 3. Configure DRM (Adapted for local JSON data)
+            const config = {
+                drm: {
+                    servers: {},
+                    clearKeys: {}
+                }
+            };
+
+            // Map k1/k2 from your JSON to ClearKeys
+            if (stream.k1 && stream.k2) {
+                config.drm.clearKeys[stream.k1] = stream.k2;
+            }
+
+            player.configure(config);
+
+            console.log(`Loading Channel: ${stream.name}`);
+
+            // 4. Load Manifest
+            await player.load(stream.manifestUri);
+            
+            // 5. Play
+            videoElement.play().catch(e => console.warn("Autoplay prevented:", e));
+
+        } catch (e) {
+            console.error('Player Load Error', e);
+            onError({ detail: e });
+        }
+
+        // 6. Update UI Text
+        document.getElementById('player-channel-name').textContent = stream.name;
+        document.getElementById('player-channel-status').textContent = "Now Playing"; // or stream.group
+        document.title = `${stream.name} - Phillite`;
+
+        // 7. Handle Layout (Mobile/Desktop)
+        if (!isDesktop()) {
+            const miniLogo = document.getElementById("minimized-player-logo");
+            if(miniLogo) {
+                miniLogo.src = stream.logo || 'assets/favicon.png';
+                miniLogo.style.display = 'block';
+            }
+            
+            document.getElementById('minimized-player-name').textContent = stream.name;
+            document.getElementById('minimized-player-status').textContent = "Now Playing";
+
+            if (minimizedPlayer) minimizedPlayer.classList.remove('active');
+            if (playerView) playerView.classList.add('active');
+        } else {
+            // Desktop behavior
+            if (playerView) playerView.classList.add('active');
+        }
+    };
+
+    // --- PLAYER CONTROLS (Minimize/Close/Restore) ---
+    const minimizePlayer = () => {
+        if (isDesktop()) return; // Desktop usually keeps player visible or different layout
+        
+        if (playerView && playerView.classList.contains('active')) {
+            playerView.classList.remove('active');
+            setTimeout(() => {
+                if (minimizedPlayer) minimizedPlayer.classList.add('active');
+            }, 250);
+        }
+    };
+
+    const restorePlayer = (e) => {
+        if (isDesktop() || e.target.closest('#exit-player-btn')) return;
+        
+        if (minimizedPlayer && minimizedPlayer.classList.contains('active')) {
+            minimizedPlayer.classList.remove('active');
+            if (playerView) playerView.classList.add('active');
+        }
+    };
+
+    const closePlayer = async (e) => {
+        e.stopPropagation();
+
+        if (videoElement) videoElement.style.display = 'block'; // Reset display
+        if (ui) ui.setEnabled(false);
+        
+        if (player) {
+            await player.unload();
+            setVideoPoster(); // Show poster when idle
+        }
+        
+        activeStream = null;
+        document.title = originalTitle;
+
+        if (playerView) playerView.classList.remove('active');
+        if (minimizedPlayer) minimizedPlayer.classList.remove('active');
+        
+        // Reset text
+        document.getElementById('player-channel-name').textContent = 'Select a Channel';
+        document.getElementById('player-channel-status').textContent = 'Idle';
+    };
+
+
+    // --- CHANNEL DATA & RENDERING ---
+    async function fetchChannels() {
+        spinner.style.display = 'flex';
+        try {
+            const response = await fetch('assets/database/getChannels.js'); // Ensure this file exists
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const channels = await response.json();
+            spinner.style.display = 'none';
+            return channels;
         } catch (error) {
             console.error("Failed to load channels:", error);
-            allSelectors.spinner.style.display = 'none';
-            allSelectors.channelListingsContainer.innerHTML = '<p style="padding:20px; text-align:center; color:#666;">Failed to load channels.</p>';
+            spinner.style.display = 'none';
+            channelListingsContainer.innerHTML = '<p style="text-align:center; padding:20px;">Failed to load channels.</p>';
             return [];
         }
     }
 
     const renderChannels = (reset = false) => {
         if (reset) {
-            allSelectors.channelListingsContainer.innerHTML = '';
+            channelListingsContainer.innerHTML = '';
             currentlyDisplayedCount = 0;
         }
 
         const channelsToRender = currentFilteredStreams.slice(currentlyDisplayedCount, currentlyDisplayedCount + CHANNELS_PER_PAGE);
 
+        if(channelsToRender.length === 0 && reset) {
+            channelListingsContainer.innerHTML = '<p style="text-align:center; width:100%; padding:20px;">No results found.</p>';
+        }
+
         channelsToRender.forEach(stream => {
             const item = document.createElement('div');
             item.className = 'channel-list-item';
+            const logoSrc = stream.logo || 'assets/favicon.png';
             
             item.innerHTML = `
                 <div class="channel-info-left">
-                    <img src="${stream.logo}" alt="${stream.name}" class="channel-logo" onerror="this.src='/assets/favicon.png'; this.style.opacity='0.5'">
+                    <img src="${logoSrc}" alt="${stream.name}" class="channel-logo" loading="lazy" onerror="this.src='assets/favicon.png'">
                     <span class="channel-name">${stream.name}</span>
                 </div>
                 <div class="channel-info-right">
@@ -138,68 +247,31 @@ async function initApp() {
                 </div>`;
 
             item.addEventListener('click', () => openPlayer(stream));
-            allSelectors.channelListingsContainer.appendChild(item);
+            channelListingsContainer.appendChild(item);
         });
 
         currentlyDisplayedCount += channelsToRender.length;
-        allSelectors.loadMoreContainer.style.display = currentlyDisplayedCount < currentFilteredStreams.length ? 'block' : 'none';
-    };
-
-    const openPlayer = (stream) => {
-        activeStream = stream;
-        loadStream(stream);
-
-        document.getElementById("player-channel-name").textContent = stream.name;
-        document.getElementById("player-channel-status").textContent = "Now Playing";
         
-        document.getElementById("minimized-player-name").textContent = stream.name;
-        document.getElementById("minimized-player-status").textContent = "Now Playing";
-
-        const miniLogo = document.getElementById("minimized-player-logo");
-        miniLogo.src = stream.logo;
-        miniLogo.style.display = 'block';
-
-        allSelectors.playerView.classList.add("active");
-        allSelectors.minimizedPlayer.classList.remove("active");
-    };
-
-    const minimizePlayer = () => {
-        allSelectors.playerView.classList.remove("active");
-        setTimeout(() => {
-            allSelectors.minimizedPlayer.classList.add("active");
-        }, 300);
-    };
-
-    const restorePlayer = (e) => {
-        if(e.target.closest('#exit-player-btn')) return;
-        allSelectors.minimizedPlayer.classList.remove("active");
-        allSelectors.playerView.classList.add("active");
-    };
-
-    const closePlayer = (e) => {
-        e.stopPropagation();
-        if (shakaPlayer) {
-            shakaPlayer.unload();
-            document.getElementById('video').removeAttribute('src'); 
-            document.getElementById('video').load();
+        if (currentlyDisplayedCount >= currentFilteredStreams.length) {
+            loadMoreContainer.style.display = 'none';
+        } else {
+            loadMoreContainer.style.display = 'block';
         }
-        allSelectors.minimizedPlayer.classList.remove("active");
-        allSelectors.playerView.classList.remove("active");
-        activeStream = null;
     };
 
+    // --- SEARCH LOGIC ---
     const setupSearch = () => {
-        allSelectors.searchToggle.addEventListener('click', () => {
-            allSelectors.searchContainer.classList.toggle('active');
-            if(allSelectors.searchContainer.classList.contains('active')) {
-                allSelectors.searchInput.focus();
+        searchToggle.addEventListener('click', () => {
+            searchContainer.classList.toggle('active');
+            if(searchContainer.classList.contains('active')) {
+                searchInput.focus();
             } else {
-                allSelectors.searchInput.value = '';
+                searchInput.value = '';
                 performSearch('');
             }
         });
 
-        allSelectors.searchInput.addEventListener('input', (e) => {
+        searchInput.addEventListener('input', (e) => {
             performSearch(e.target.value.toLowerCase());
         });
     };
@@ -207,16 +279,18 @@ async function initApp() {
     const performSearch = (query) => {
         if (query.length > 0) {
             currentFilteredStreams = allStreams.filter(s => s.name.toLowerCase().includes(query));
-            allSelectors.channelHeader.textContent = `Search Results (${currentFilteredStreams.length})`;
+            channelHeader.textContent = `Search Results (${currentFilteredStreams.length})`;
         } else {
             currentFilteredStreams = [...allStreams];
-            allSelectors.channelHeader.textContent = "Channels";
+            channelHeader.textContent = "Channels";
         }
         renderChannels(true);
     };
 
+    // --- MENU & SLIDER LOGIC ---
     const renderMenu = () => {
-        allSelectors.floatingMenu.innerHTML = `
+        // Keeping your original simple menu for now
+        floatingMenu.innerHTML = `
         <ul>
             <li><a href="#"><span class="material-symbols-rounded">info</span> About Us</a></li>
             <li><a href="#"><span class="material-symbols-rounded">quiz</span> FAQ</a></li>
@@ -224,11 +298,11 @@ async function initApp() {
             <li><a href="#"><span class="material-symbols-rounded">gavel</span> Terms of Service</a></li>
         </ul>`;
 
-        allSelectors.menuBtn.addEventListener("click", (e) => {
+        menuBtn.addEventListener("click", (e) => {
             e.stopPropagation();
-            allSelectors.floatingMenu.classList.toggle("active");
+            floatingMenu.classList.toggle("active");
         });
-        document.addEventListener("click", () => allSelectors.floatingMenu.classList.remove("active"));
+        document.addEventListener("click", () => floatingMenu.classList.remove("active"));
     };
 
     const setupSlider = () => {
@@ -236,6 +310,9 @@ async function initApp() {
         if (!slider) return;
         const slides = slider.querySelectorAll(".slide");
         const dots = slider.parentElement.querySelectorAll(".slider-nav .dot");
+        
+        if(slides.length === 0) return;
+
         let currentSlide = 0;
         let slideInterval = setInterval(nextSlide, 5000);
 
@@ -257,19 +334,29 @@ async function initApp() {
         });
     };
 
-    window.addEventListener("scroll", () => allSelectors.header.classList.toggle("scrolled", window.scrollY > 10));
+    // --- EVENT LISTENERS ---
+    window.addEventListener('resize', () => {
+        setVideoPoster();
+        // Optional: Re-check layout if needed
+    });
     
+    window.addEventListener("scroll", () => {
+        header.classList.toggle("scrolled", window.scrollY > 10);
+    });
+
+    if(minimizeBtn) minimizeBtn.addEventListener('click', minimizePlayer);
+    if(minimizedPlayer) minimizedPlayer.addEventListener('click', restorePlayer);
+    if(exitBtn) exitBtn.addEventListener('click', closePlayer);
+    if(loadMoreBtn) loadMoreBtn.addEventListener('click', () => renderChannels(false));
+
+    // --- INITIALIZE ---
     setupSearch();
     renderMenu();
     setupSlider();
+    setVideoPoster();
 
-    allSelectors.loadMoreBtn.addEventListener('click', () => renderChannels(false));
-    allSelectors.minimizeBtn.addEventListener('click', minimizePlayer);
-    allSelectors.minimizedPlayer.addEventListener('click', restorePlayer);
-    allSelectors.exitBtn.addEventListener('click', closePlayer);
-
-    // Initialize channels
+    // Load Data
     allStreams = await fetchChannels();
     currentFilteredStreams = [...allStreams];
-    renderChannels();
-}
+    renderChannels(true);
+});
