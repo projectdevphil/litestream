@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <li><a href="/litestream/faq"><span class="material-symbols-rounded">quiz</span> FAQ</a></li>
             <li><a href="/litestream/privacy"><span class="material-symbols-rounded">shield</span> Privacy Policy</a></li>
             <li><a href="/litestream/terms"><span class="material-symbols-rounded">gavel</span> Terms of Service</a></li>
-            <li><a href="/stream-tester"><span class="material-symbols-rounded">tabs</span> Stream Tester</a></li>            
+            <li><a href="/stream-tester"><span class="material-symbols-rounded">labs</span> Stream Tester</a></li>            
         </ul>`;
     };
 
