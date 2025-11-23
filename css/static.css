@@ -143,6 +143,7 @@ hr {
 .social-icon-links img {
     height: 24px;
     width: 24px;
+    filter: grayscale(100%);
     pointer-events: none;
 }
 
