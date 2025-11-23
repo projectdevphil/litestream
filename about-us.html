@@ -67,20 +67,16 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. DISABLE LONG PRESS
             const protectedElements = document.querySelectorAll('.back-button, .social-icon-links a, .developer-section a, img');
             protectedElements.forEach(el => {
                 el.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; });
             });
 
-            // 2. SCROLL EFFECT
             const header = document.querySelector(".static-header");
             window.addEventListener("scroll", () => {
                 header.classList.toggle("scrolled", window.scrollY > 10);
             });
         });
     </script>
-</body>
-</html>
 </body>
 </html>
