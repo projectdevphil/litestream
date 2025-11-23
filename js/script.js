@@ -95,6 +95,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             player = new shaka.Player(videoElement);
             try {
                 ui = new shaka.ui.Overlay(player, playerWrapper, videoElement);
+                ui.configure({
+                addSeekBar: false,
+            });
             } catch (e) {
                 console.warn("UI init failed", e);
                 videoElement.controls = true;
