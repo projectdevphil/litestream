@@ -14,11 +14,10 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/static.css">
 </head>
-<!-- ... HEAD (Same as before) ... -->
 <body>
     <div class="static-page-container">
         <header class="static-header">
-            <a href="/" class="back-button" aria-label="Back to Litestream">
+            <a href="/litestream" class="back-button" aria-label="Back to Litestream">
                 <span class="material-symbols-rounded">arrow_back</span>
             </a>
             <h1>FAQ</h1>
@@ -28,28 +27,28 @@
             <section>
                 <h2><span class="material-symbols-rounded">help</span> Frequently Asked Questions</h2>
                 
+                <p>Welcome to the Litestream Help Center. Here you will find answers to common inquiries regarding our service, troubleshooting playback issues, and general usage guidelines. We hope this helps clarify how our free streaming platform operates.</p>
+                
+                <hr>
+
                 <h3>Is Litestream free to use?</h3>
                 <p>Yes, Litestream is 100% free. We believe in providing open access to information and entertainment for Filipinos without subscription fees.</p>
-                
-                <!-- Separator Added -->
+
                 <hr>
 
                 <h3>Why is a channel buffering or not loading?</h3>
                 <p>Buffering is usually caused by a slow internet connection or high traffic on the source server. Since we do not host the streams, we cannot control the quality or stability of the source broadcast. Try refreshing the page or selecting a different channel.</p>
-                
-                <!-- Separator Added -->
+
                 <hr>
 
                 <h3>Do I need to register an account?</h3>
                 <p>No registration is required. You can simply visit the website and start watching immediately.</p>
-                
-                <!-- Separator Added -->
+
                 <hr>
 
                 <h3>Can I request a specific channel?</h3>
                 <p>You can send suggestions via our feedback channels on PHCorner, but please note that we can only add channels that have publicly available stream URLs.</p>
-                
-                <!-- Separator Added -->
+
                 <hr>
 
                 <h3>Is this legal?</h3>
@@ -60,7 +59,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. DISABLE LONG PRESS / CONTEXT MENU
             const protectedElements = document.querySelectorAll('.back-button, img, a');
             protectedElements.forEach(el => {
                 el.addEventListener('contextmenu', (e) => {
@@ -69,7 +67,6 @@
                 });
             });
 
-            // 2. SCROLL EFFECT FOR HEADER
             const header = document.querySelector(".static-header");
             window.addEventListener("scroll", () => {
                 if(header) {
