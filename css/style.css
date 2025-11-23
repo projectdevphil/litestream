@@ -338,11 +338,11 @@ header nav {
 
 .channel-logo {
     flex-shrink: 0;
-    height: 50px;
+    height: 40px;
     filter: grayscale(100%);
     object-fit: contain;
     pointer-events: none;
-    width: 60px;
+    width: 40px;
     background: transparent;
     border-radius: 4px;
     padding: 2px;
