@@ -40,6 +40,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentFilteredStreams = [];
     let currentlyDisplayedCount = 0;
 
+    // --- [NEW] HELPER: CREATE URL SLUG ---
+    // Turns "GMA 7" into "gma-7" for the URL
+    const createSlug = (name) => {
+        if (!name) return '';
+        return name.toString().toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-')           // Replace spaces with -
+            .replace(/[^\w\-]+/g, '')       // Remove non-word chars
+            .replace(/\-\-+/g, '-');        // Replace multiple - with single -
+    };
+
     // --- 1. RENDER MENU ---
     const renderMenu = () => {
         if (!floatingMenu) return;
@@ -89,17 +100,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (minimizedPlayer) minimizedPlayer.classList.remove('active');
         }
 
-        // 2. Update Info & RESET LOGO VISIBILITY
+        // 2. Update Info
         mainPlayerName.textContent = stream.name;
         updateStatusText("Connecting...", "var(--theme-color)"); // Blue while loading
 
         if(miniPlayerName) miniPlayerName.textContent = stream.name;
         
-        // LOGO FIX: Ensure display is block so it shows up in minimized player
         if(miniPlayerLogo) {
             miniPlayerLogo.src = stream.logo || 'assets/favicon.png';
             miniPlayerLogo.style.display = 'block'; 
         }
+
+        // --- [NEW] UPDATE URL BAR ---
+        // Changes URL to /?channel=channel-slug
+        const slug = createSlug(stream.name);
+        const newUrl = `${window.location.pathname}?channel=${slug}`;
+        window.history.pushState({ path: newUrl }, '', newUrl);
 
         // 3. Init Player
         if (!player) {
@@ -121,7 +137,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             await player.load(stream.manifestUri);
             videoElement.play().catch(() => console.log("Auto-play blocked"));
             
-            // Success Color (Blue/Theme Color)
             updateStatusText("Now Playing", "var(--theme-color)");
 
         } catch (e) {
@@ -130,7 +145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Helper to change text and color simultaneously
+    // Helper to change text and color
     function updateStatusText(text, color) {
         if(mainPlayerStatus) {
             mainPlayerStatus.textContent = text;
@@ -165,6 +180,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(playerView) playerView.classList.remove('active');
         if(minimizedPlayer) minimizedPlayer.classList.remove('active');
         document.body.classList.remove('no-scroll');
+
+        // --- [NEW] RESET URL ---
+        // Removes the query param when player closes
+        window.history.pushState({}, '', window.location.pathname);
     };
 
     // --- 5. FETCH & RENDER ---
@@ -274,7 +293,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         header.classList.toggle("scrolled", window.scrollY > 10);
     });
 
+    // --- LOAD DATA ---
     allStreams = await fetchChannels();
     currentFilteredStreams = [...allStreams];
     renderChannels(true);
+
+    // --- [NEW] AUTO PLAY FROM URL ---
+    // 1. Get the parameters from the URL (e.g. ?channel=kapamilya-channel)
+    const urlParams = new URLSearchParams(window.location.search);
+    const channelSlug = urlParams.get('channel');
+
+    // 2. If a channel parameter exists
+    if (channelSlug) {
+        // 3. Search the loaded streams for a match
+        const foundChannel = allStreams.find(s => createSlug(s.name) === channelSlug);
+        
+        if (foundChannel) {
+            // 4. Play it immediately
+            console.log("URL Link detected for:", foundChannel.name);
+            openPlayer(foundChannel);
+        }
+    }
 });
