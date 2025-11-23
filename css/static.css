@@ -1,9 +1,6 @@
-/* --- static.css --- */
-
 .static-page-container {
     margin: 0 auto;
     max-width: 800px;
-    /* Fixed: Reduced top padding because body already has 60px padding */
     padding: 0 20px 40px 20px; 
     width: 100%;
     box-sizing: border-box;
@@ -14,14 +11,13 @@
     align-items: center;
     display: flex;
     height: 60px;
-    /* Fixed: Made it stick to top */
     position: fixed; 
     top: 0;
     left: 0;
     right: 0;
     z-index: 1000;
     padding: 0 20px;
-    background: transparent; /* Start transparent */
+    background: transparent;
     transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
 }
 
@@ -52,13 +48,11 @@
     display: flex;
     height: 40px;
     justify-content: center;
-    /* Fixed Position inside header */
     position: absolute;
     left: 20px;
     text-decoration: none;
     transition: background 0.2s ease;
-    width: 40px;
-    
+    width: 40px;   
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
@@ -74,7 +68,6 @@
     border-radius: var(--border-radius);
     border: 1px solid rgba(255, 255, 255, 0.05);
     padding: 25px;
-    /* Added margin top to ensure content doesn't hide behind header initially */
     margin-top: 10px; 
     margin-bottom: 20px;
 }
@@ -117,12 +110,12 @@
 hr {
     border: 0;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin: 25px 0; /* Spacing for separators */
+    margin: 25px 0;
 }
 
 /* Utilities */
 .text-center {
-    text-align: center;
+    text-align: left;
 }
 
 .social-icon-links {
