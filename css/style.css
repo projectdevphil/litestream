@@ -585,7 +585,7 @@ header nav {
     border: 1px solid #333;
     border-radius: 50px;
     color: var(--text-color);
-    font-family: "Netflix Sans", sans-serif;
+    font-family: 'Stack Sans Text', sans-serif;
     font-size: 0.8rem;
     padding: 10px 25px;
 }
