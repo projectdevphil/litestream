@@ -14,11 +14,10 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/static.css">
 </head>
-<!-- ... HEAD (Same as before) ... -->
 <body>
     <div class="static-page-container">
         <header class="static-header">
-            <a href="/" class="back-button" aria-label="Back to Litestream">
+            <a href="/litestream" class="back-button" aria-label="Back to Litestream">
                 <span class="material-symbols-rounded">arrow_back</span>
             </a>
             <h1>Terms of Service</h1>
@@ -29,22 +28,22 @@
                 <h2>1. Acceptance of Terms</h2>
                 <p>By accessing and using Litestream, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by these terms, please do not use this service.</p>
 
-                <hr> <!-- Separator -->
+                <hr>
 
                 <h2>2. Use of Service</h2>
                 <p>Litestream is provided for personal, non-commercial use only. You agree not to use the service for any unlawful purpose or to transmit any material that violates the rights of others.</p>
 
-                <hr> <!-- Separator -->
+                <hr>
 
                 <h2>3. Intellectual Property & Content</h2>
                 <p>Litestream does not host, archive, store, or distribute media of any kind. We act purely as a search index for media posted by others on the internet. All trademarks, logos, and content found via streams are the property of their respective owners.</p>
 
-                <hr> <!-- Separator -->
+                <hr>
 
                 <h2>4. Limitation of Liability</h2>
                 <p>The service is provided "as is" and "as available" without any warranties. Litestream shall not be liable for any damages resulting from the use or inability to use the service, or for the content of any third-party streams accessed through our platform.</p>
 
-                <hr> <!-- Separator -->
+                <hr>
 
                 <h2>5. Modifications</h2>
                 <p>We reserve the right to modify these terms at any time. Your continued use of the website after any such changes constitutes your acceptance of the new Terms of Service.</p>
@@ -54,13 +53,11 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. DISABLE LONG PRESS
             const protectedElements = document.querySelectorAll('.back-button, img, a');
             protectedElements.forEach(el => {
                 el.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; });
             });
 
-            // 2. SCROLL EFFECT
             const header = document.querySelector(".static-header");
             window.addEventListener("scroll", () => {
                 header.classList.toggle("scrolled", window.scrollY > 10);
