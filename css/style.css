@@ -79,7 +79,6 @@ header.scrolled {
 
 .logo {
     color: var(--text-color);
-    margin-top: 2pc;
     font-size: 1.38rem;
     font-weight: 900;
     letter-spacing: -0.5px;
