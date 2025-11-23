@@ -414,36 +414,29 @@ header nav {
     overflow: hidden; /* Ensures rounded corners clip video */
 }
 
-/* --- SHAKA PLAYER FONT FIX --- */
-
-/* 1. Target the main container and settings menu */
 .shaka-video-container,
 .shaka-settings-menu,
 .shaka-overflow-menu {
-    /* FIX: Corrected spelling from 'Neflix' to 'Netflix' */
     font-family: 'BR Sonoma', sans-serif !important;
-    font-weight: 500;
+    font-weight: 700;
+    overflow: hidden;
 }
 
-/* 2. Force buttons and labels to inherit the font */
 .shaka-controls-container button,
 .shaka-controls-container span,
 .shaka-text-container {
     font-family: 'BR Sonoma', sans-serif !important;
 }
 
-/* 3. OPTIONAL: Make the time text slightly bolder like Netflix */
 .shaka-current-time,
 .shaka-duration {
-    font-weight: 500;
+    font-weight: 700;
 }
 
-/* Targets Shaka's internal controls to apply blue theme */
 .shaka-controls-button-panel .material-icons-round {
     color: var(--theme-color) !important;
 }
 
-/* Ensure range/seek bar (if visible) matches theme */
 .shaka-range-element {
     color: var(--theme-color) !important;
 }
