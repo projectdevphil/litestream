@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const CHANNELS_PER_PAGE = 50;
 
     // --- ASSETS ---
-    const POSTER_MOBILE = 'assets/poster/mobile.png';
-    const POSTER_DESKTOP = 'assets/poster/desktop.png';
+    const POSTER_MOBILE = 'assets/poster/mobile.svg';
+    const POSTER_DESKTOP = 'assets/poster/desktop.svg';
 
     // --- SELECTORS ---
     const header = document.querySelector("header");
