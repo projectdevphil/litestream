@@ -1,10 +1,10 @@
 /* --- static.css --- */
-/* This file handles styles for About, FAQ, Privacy, Terms pages */
 
 .static-page-container {
     margin: 0 auto;
     max-width: 800px;
-    padding: 0 20px 40px 20px; /* Bottom padding for scrolling space */
+    /* Fixed: Reduced top padding because body already has 60px padding */
+    padding: 0 20px 40px 20px; 
     width: 100%;
     box-sizing: border-box;
 }
@@ -14,14 +14,28 @@
     align-items: center;
     display: flex;
     height: 60px;
-    margin-bottom: 20px;
-    position: relative;
-    width: 100%;
+    /* Fixed: Made it stick to top */
+    position: fixed; 
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 0 20px;
+    background: transparent; /* Start transparent */
+    transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+/* Fixed: The Blur Effect when scrolling */
+.static-header.scrolled {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    background: var(--glass-bg);
+    border-bottom: var(--glass-border);
 }
 
 .static-header h1 {
     flex-grow: 1;
-    font-size: 1.2rem; /* Matches app header size */
+    font-size: 1.2rem; 
     font-weight: 700;
     margin: 0;
     text-align: center;
@@ -31,20 +45,20 @@
 /* Back Button Styling */
 .back-button {
     align-items: center;
-    background: rgba(255, 255, 255, 0.1); /* Slight background */
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 50%;
     color: var(--text-color);
     cursor: pointer;
     display: flex;
     height: 40px;
     justify-content: center;
-    left: 0;
+    /* Fixed Position inside header */
     position: absolute;
+    left: 20px;
     text-decoration: none;
     transition: background 0.2s ease;
     width: 40px;
     
-    /* Prevent Selection/Callouts */
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
@@ -58,12 +72,14 @@
 .content-card {
     background-color: var(--card-background);
     border-radius: var(--border-radius);
-    border: 1px solid rgba(255, 255, 255, 0.05); /* Subtle border */
+    border: 1px solid rgba(255, 255, 255, 0.05);
     padding: 25px;
+    /* Added margin top to ensure content doesn't hide behind header initially */
+    margin-top: 10px; 
     margin-bottom: 20px;
 }
 
-/* Typography inside cards */
+/* Typography */
 .content-card h2 {
     align-items: center;
     color: var(--text-color);
@@ -76,7 +92,7 @@
 }
 
 .content-card h3 {
-    color: var(--theme-color); /* Use your Blue/White theme accent */
+    color: var(--theme-color);
     font-size: 1rem;
     font-weight: 600;
     margin-bottom: 10px;
@@ -101,15 +117,14 @@
 hr {
     border: 0;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin: 30px 0;
+    margin: 25px 0; /* Spacing for separators */
 }
 
-/* Text Alignment Helpers */
+/* Utilities */
 .text-center {
     text-align: center;
 }
 
-/* Social Icons (About Us) */
 .social-icon-links {
     display: flex;
     gap: 20px;
@@ -119,7 +134,7 @@ hr {
 
 .social-icon-links a {
     align-items: center;
-    background-color: #ffffff; /* White background for logos */
+    background-color: #ffffff;
     border-radius: 50%;
     display: flex;
     height: 45px;
@@ -135,10 +150,9 @@ hr {
 .social-icon-links img {
     height: 24px;
     width: 24px;
-    pointer-events: none; /* Prevents image dragging */
+    pointer-events: none;
 }
 
-/* Developer Section */
 .developer-section {
     display: flex;
     flex-direction: column;
@@ -153,7 +167,6 @@ hr {
     pointer-events: none;
 }
 
-/* Material Symbols override for headers */
 .content-card h2 .material-symbols-rounded {
     font-size: 1.3rem;
     color: var(--theme-color);
