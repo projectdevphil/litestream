@@ -152,6 +152,14 @@
     "k2": "55c3c014f2bd12d6bd62349658f24566"
   },
   {
+    "name": "MTV Live",
+    "logo": "https://static.wikia.nocookie.net/logopedia/images/7/7f/MTV_Live_2021.svg",
+    "group": "Music",
+    "manifestUri": "https://linearjitp-playback.astro.com.my/dash-wv/linear/5014/default_ott.mpd",
+    "k1": "3ac2542a4f7be746633db07647451710",
+    "k2": "22f964a6d6927ccdba482e775cdff190"
+  },
+  {
     "name": "HBO",
     "logo": "https://images.now-tv.com/shares/channelPreview/img/en_hk/color/ch115_170_122",
     "group": "Movies",
@@ -161,7 +169,7 @@
   },
   {
     "name": "Tap Action Flix",
-    "logo": "https://i.ibb.co/wgjPKFW/IMG-20241029-111906.png",
+    "logo": "https://static.wikia.nocookie.net/logopedia/images/8/88/TAP_ActionFlix_logo.png",
     "group": "Movies",
     "manifestUri": "https://qp-pldt-live-bpk-01-prod.akamaized.net/bpk-tv/cg_tapactionflix_hd1/default/index.mpd",
     "k1": "bee1066160c0424696d9bf99ca0645e3",
@@ -206,5 +214,13 @@
     "manifestUri": "https://qp-pldt-live-bpk-02-prod.akamaized.net/bpk-tv/cgnl_nba/default/index.mpd",
     "k1": "c5e51f41ceac48709d0bdcd9c13a4d88",
     "k2": "20b91609967e472c27040716ef6a8b9a"
+  },
+  {
+    "name": "PBB Catch-Up Episode",
+    "logo": "https://pql-static.abs-cbn.com/images/pbbcelebritycollab.title.V4.PNG",
+    "group": "Reality",
+    "manifestUri": "https://abslive.akamaized.net/dash/live/2032648/event2/manifest.mpd",
+    "k1": "1331c900677b4219a18938d0430ee7ee",
+    "k2": "0ffce86c99f7051b3ec63e09c6ce9aad"
   }
 ]
