@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const loadMoreContainer = document.getElementById("load-more-container");
     const loadMoreBtn = document.getElementById("load-more-btn");
     
+    // [UPDATED] Selector for the text "All Channels"
+    const channelHeader = document.getElementById("channel-list-header") || document.querySelector(".section-header h2") || document.querySelector("h2"); 
+    
     const playerView = document.getElementById('player-view');
     const videoElement = document.getElementById('video');
     const playerWrapper = document.getElementById('video-container'); 
@@ -52,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .replace(/\-\-+/g, '-');        
     };
 
-    // --- 1. RENDER MENU (UPDATED) ---
+    // --- 1. RENDER MENU ---
     const renderMenu = () => {
         if (!floatingMenu) return;
         floatingMenu.innerHTML = `
@@ -64,19 +67,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             <li><a href="/stream-tester"><span class="material-symbols-rounded">labs</span> Stream Tester</a></li>            
         </ul>`;
 
-        // [NEW] DISABLE LONG PRESS / HARD PRESS MENU
+        // DISABLE LONG PRESS / HARD PRESS MENU
         const menuLinks = floatingMenu.querySelectorAll('a');
         menuLinks.forEach(link => {
-            // 1. Prevent Right Click / Long Press Context Menu
             link.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 return false;
             });
-
-            // 2. CSS Styles to prevent selection and iOS callouts
-            link.style.userSelect = 'none';              // Prevent text selection
-            link.style.webkitUserSelect = 'none';        // Safari/Chrome
-            link.style.webkitTouchCallout = 'none';      // iOS Safari (Disables link preview/menu)
+            link.style.userSelect = 'none';              
+            link.style.webkitUserSelect = 'none';        
+            link.style.webkitTouchCallout = 'none';      
         });
     };
 
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             player.addEventListener('error', (event) => {
                 console.error('Error code', event.detail.code);
-                updateStatusText("Stream Offline / Error", "red");
+                updateStatusText("Stream Offline", "red");
             });
 
             return true;
@@ -117,7 +117,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 2. Update Info
         mainPlayerName.textContent = stream.name;
-        updateStatusText("Connecting...", "var(--theme-color)");
+        
+        // [UPDATED] Show "Connecting..." initially, but use Group later
+        updateStatusText("Connecting...", "var(--theme-color)"); 
 
         if(miniPlayerName) miniPlayerName.textContent = stream.name;
         
@@ -153,7 +155,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             await player.load(stream.manifestUri);
             videoElement.play().catch(() => console.log("Auto-play blocked"));
             
-            updateStatusText("Now Playing", "var(--theme-color)");
+            // [UPDATED] Replace "Now Playing" with Group Name
+            const groupTitle = stream.group || "Live Stream"; 
+            updateStatusText(groupTitle, "var(--theme-color)");
 
         } catch (e) {
             console.error('Load failed', e);
@@ -197,6 +201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(minimizedPlayer) minimizedPlayer.classList.remove('active');
         document.body.classList.remove('no-scroll');
 
+        // --- RESET URL & TITLE ---
         window.history.pushState({}, '', window.location.pathname);
         document.title = defaultPageTitle;
     };
@@ -293,9 +298,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         searchContainer.classList.toggle("active");
         if(searchContainer.classList.contains("active")) searchInput.focus();
     });
+
+    // --- [UPDATED] SEARCH LOGIC ---
     searchInput.addEventListener("input", (e) => {
         const query = e.target.value.toLowerCase();
-        currentFilteredStreams = allStreams.filter(s => s.name.toLowerCase().includes(query));
+        
+        // 1. Filter by Name OR Group
+        currentFilteredStreams = allStreams.filter(s => {
+            const nameMatch = s.name.toLowerCase().includes(query);
+            const groupMatch = s.group ? s.group.toLowerCase().includes(query) : false;
+            return nameMatch || groupMatch;
+        });
+
+        // 2. Update Header Text based on search
+        if(channelHeader) {
+            if (query === '') {
+                channelHeader.textContent = "All Channels";
+            } else {
+                channelHeader.textContent = `Search Results (${currentFilteredStreams.length})`;
+            }
+        }
+
         renderChannels(true);
     });
 
