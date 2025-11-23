@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const loadMoreContainer = document.getElementById("load-more-container");
     const loadMoreBtn = document.getElementById("load-more-btn");
     
-    // Selector for the header that changes on search
     const channelHeader = document.getElementById("channel-list-header") || document.querySelector(".section-header h2") || document.querySelector("h2"); 
     
     const playerView = document.getElementById('player-view');
@@ -57,10 +56,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             .replace(/\-\-+/g, '-');        
     };
 
-    // --- [NEW] POSTER LOGIC ---
+    // --- POSTER LOGIC ---
     const setResponsivePoster = () => {
         if (!videoElement) return;
-        const isDesktop = window.innerWidth > 1024; // Desktop breakpoint
+        const isDesktop = window.innerWidth > 1024; 
         videoElement.poster = isDesktop ? POSTER_DESKTOP : POSTER_MOBILE;
     };
     
@@ -80,7 +79,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             <li><a href="/stream-tester"><span class="material-symbols-rounded">labs</span> Stream Tester</a></li>            
         </ul>`;
 
-        // DISABLE LONG PRESS
         const menuLinks = floatingMenu.querySelectorAll('a');
         menuLinks.forEach(link => {
             link.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; });
@@ -112,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // --- 3. OPEN PLAYER ---
+    // --- 3. OPEN PLAYER (UPDATED) ---
     const openPlayer = async (stream) => {
         // 1. Show UI
         if (playerView) {
@@ -121,9 +119,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (minimizedPlayer) minimizedPlayer.classList.remove('active');
         }
 
-        // 2. Update Info
+        // 2. Update Info & Set Group Name Immediately
         mainPlayerName.textContent = stream.name;
-        updateStatusText("Connecting...", "var(--theme-color)"); 
+        
+        // [UPDATED] Define Group Name here and set it immediately
+        const groupTitle = stream.group || "Live Stream"; 
+        updateStatusText(groupTitle, "var(--theme-color)"); 
 
         if(miniPlayerName) miniPlayerName.textContent = stream.name;
         if(miniPlayerLogo) {
@@ -157,9 +158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             await player.load(stream.manifestUri);
             videoElement.play().catch(() => console.log("Auto-play blocked"));
             
-            // Show Group Name
-            const groupTitle = stream.group || "Live Stream"; 
-            updateStatusText(groupTitle, "var(--theme-color)");
+            // (Group name is already set above, so we don't need to set it again here)
 
         } catch (e) {
             console.error('Load failed', e);
@@ -203,14 +202,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(minimizedPlayer) minimizedPlayer.classList.remove('active');
         document.body.classList.remove('no-scroll');
 
-        // Reset URL & Title
         window.history.pushState({}, '', window.location.pathname);
         document.title = defaultPageTitle;
-
-        // [NEW] If closing on desktop, maybe reset to default text?
-        // (Optional: Un-comment if you want it to reset when manually closed)
-        // mainPlayerName.textContent = "Channel Name";
-        // updateStatusText("Group Name", "var(--text-color)");
     };
 
     // --- 5. FETCH & RENDER ---
@@ -340,8 +333,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderChannels(true);
 
     // --- STARTUP LOGIC ---
-    
-    // 1. Check for URL Link (Priority)
     const urlParams = new URLSearchParams(window.location.search);
     const channelSlug = urlParams.get('channel');
     let hasPlayedLink = false;
@@ -355,24 +346,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // 2. [UPDATED] Desktop Default State (No Autoplay)
-    // If no link is clicked and we are on desktop (> 1024px)
+    // Desktop Default State (No Autoplay)
     if (!hasPlayedLink && window.innerWidth > 1024) {
         console.log("Desktop Mode: Showing Default Player State");
         
-        // A. Make player container visible so poster is seen
         if (playerView) {
             playerView.classList.add('active');
             document.body.classList.add('no-scroll');
         }
 
-        // B. Set Default Text Placeholders
         if (mainPlayerName) mainPlayerName.textContent = "Channel Name";
-        
-        // We use a neutral color for the placeholder "Group Name"
         updateStatusText("Group Name", "var(--text-color)");
 
-        // C. Ensure Poster is set (already handled by setResponsivePoster, but good to ensure)
         if(videoElement) videoElement.poster = POSTER_DESKTOP;
     }
 });
