@@ -1,10 +1,4 @@
-/* Netflix Sans Font */
-@font-face {
-    font-family: 'Netflix Sans';
-    src: url('https://occ.a.nflxso.net/genc/hawkins/5.8.0/font/netflix-sans-core-variable-full.woff2') format('woff2');
-    font-weight: 100 900;
-    font-display: swap;
-}
+@import url('https://fonts.googleapis.com/css2?family=Stack+Sans+Text:wght@200..700&display=swap');
 
 :root {
     --background-color: #000000;
@@ -14,7 +8,7 @@
     --glass-border: 1px solid rgba(255, 255, 255, 0.1);
     --text-color: #ffffff;
     --text-secondary: #b3b3b3;
-    --theme-color: #0064FF; /* Original Blue Accent */
+    --theme-color: #ffffff; /* Original Blue Accent */
 }
 
 body {
@@ -23,8 +17,7 @@ body {
     -webkit-user-select: none;
     background-color: var(--background-color);
     color: var(--text-color);
-    font-family: "Netflix Sans", sans-serif;
-    margin: 0;
+    font-family: 'Stack Sans Text', sans-serif;    margin: 0;
     padding-top: 60px;
     scrollbar-width: none;
     user-select: none;
@@ -264,7 +257,7 @@ header nav {
 .slide-badge {
     background-color: var(--theme-color);
     border-radius: 4px;
-    color: #fff;
+    color: #000;
     display: inline-block;
     font-size: 0.5rem;
     font-weight: 700;
@@ -425,14 +418,15 @@ header nav {
 .shaka-settings-menu,
 .shaka-overflow-menu {
     /* FIX: Corrected spelling from 'Neflix' to 'Netflix' */
-    font-family: 'Netflix Sans', sans-serif !important; 
+    font-family: 'Stack Sans Text', sans-serif !important;
+    font-weight: 500;
 }
 
 /* 2. Force buttons and labels to inherit the font */
 .shaka-controls-container button,
 .shaka-controls-container span,
 .shaka-text-container {
-    font-family: 'Netflix Sans', sans-serif !important;
+    font-family: 'Stack Sans Text', sans-serif !important;
 }
 
 /* 3. OPTIONAL: Make the time text slightly bolder like Netflix */
