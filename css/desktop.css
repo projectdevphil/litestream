@@ -51,6 +51,16 @@
         padding: 0 20px;
     }
 
+    .live-indicator {
+        align-items: center;
+        color: var(--theme-color);
+        display: flex;
+        font-size: 0.9rem;
+        font-weight: 600;
+        gap: 2px;
+        margin-right: 20px;
+    }
+    
     .content-container {
         height: calc(100vh - 100px);
         overflow-y: auto;
