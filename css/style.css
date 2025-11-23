@@ -465,7 +465,7 @@ header nav {
 .player-info-left p {
     color: var(--theme-color);
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 400;
     margin: 3px 0 0 0;
 }
 
@@ -492,7 +492,7 @@ header nav {
     justify-content: space-between;
     left: 20px;
     opacity: 0;
-    padding: 20px 15px;
+    padding: 10px 15px;
     position: fixed;
     right: 20px;
     transform: translateY(20px);
@@ -517,10 +517,10 @@ header nav {
 .minimized-logo {
     background: transparent;
     filter: grayscale(100%);
-    border-radius: 4px;
-    height: 35px;
+    border-radius: 5px;
+    height: 50px;
     object-fit: contain;
-    width: 45px;
+    width: 60px;
     display: block; /* Ensure it displays */
 }
 
@@ -537,7 +537,7 @@ header nav {
     color: var(--theme-color);
     font-size: 0.65rem;
     margin: 0;
-    font-weight: 500;
+    font-weight: 400;
 }
 
 .minimized-player-right {
