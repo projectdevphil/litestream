@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Stack+Sans+Text:wght@200..700&display=swap');
+@import url('https://fonts.cdnfonts.com/css/br-sonoma');
 
 :root {
     --background-color: #000000;
@@ -17,7 +17,7 @@ body {
     -webkit-user-select: none;
     background-color: var(--background-color);
     color: var(--text-color);
-    font-family: 'Stack Sans Text', sans-serif;    margin: 0;
+    font-family: 'BR Sonoma', sans-serif;    margin: 0;
     padding-top: 60px;
     scrollbar-width: none;
     user-select: none;
@@ -123,7 +123,7 @@ header nav {
     background: transparent;
     border: none;
     color: white;
-    font-family: "Netflix Sans", sans-serif;
+    font-family: "BR Sonoma", sans-serif;
     font-size: 0.9rem;
     width: 0;
     opacity: 0;
@@ -418,7 +418,7 @@ header nav {
 .shaka-settings-menu,
 .shaka-overflow-menu {
     /* FIX: Corrected spelling from 'Neflix' to 'Netflix' */
-    font-family: 'Stack Sans Text', sans-serif !important;
+    font-family: 'BR Sonoma', sans-serif !important;
     font-weight: 500;
 }
 
@@ -426,7 +426,7 @@ header nav {
 .shaka-controls-container button,
 .shaka-controls-container span,
 .shaka-text-container {
-    font-family: 'Stack Sans Text', sans-serif !important;
+    font-family: 'BR Sonoma', sans-serif !important;
 }
 
 /* 3. OPTIONAL: Make the time text slightly bolder like Netflix */
@@ -585,7 +585,7 @@ header nav {
     border: 1px solid #333;
     border-radius: 50px;
     color: var(--text-color);
-    font-family: 'Stack Sans Text', sans-serif;
+    font-family: 'BR Sonama', sans-serif;
     font-size: 0.8rem;
     padding: 10px 25px;
 }
