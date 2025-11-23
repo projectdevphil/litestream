@@ -14,10 +14,11 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/static.css">
 </head>
+<!-- ... HEAD (Same as before) ... -->
 <body>
     <div class="static-page-container">
         <header class="static-header">
-            <a href="/litestream" class="back-button" aria-label="Back to Litestream">
+            <a href="/" class="back-button" aria-label="Back to Litestream">
                 <span class="material-symbols-rounded">arrow_back</span>
             </a>
             <h1>Privacy Policy</h1>
@@ -28,14 +29,22 @@
                 <h2>Information Collection</h2>
                 <p>Litestream prioritizes your privacy. We do not require you to create an account, and we do not collect personal identification information (PII) such as names, email addresses, or phone numbers.</p>
 
+                <hr> <!-- Separator -->
+
                 <h3>Log Data</h3>
                 <p>Like most websites, we may collect non-personal information that your browser sends whenever you visit our Service. This may include your device type, browser version, and time of visit, which is used solely for analytics to improve site performance.</p>
+
+                <hr> <!-- Separator -->
 
                 <h3>Cookies and Local Storage</h3>
                 <p>We may use Local Storage to save your preferences (such as theme settings or volume levels). These are stored on your device and are not sent to our servers.</p>
 
+                <hr> <!-- Separator -->
+
                 <h3>Third-Party Links</h3>
                 <p>Our service contains links to external sites (streams) that are not operated by us. If you click on a third-party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit.</p>
+
+                <hr> <!-- Separator -->
 
                 <h3>Changes to This Policy</h3>
                 <p>We may update our Privacy Policy from time to time. Thus, we advise you to review this page periodically for any changes.</p>
@@ -45,12 +54,16 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // 1. DISABLE LONG PRESS
             const protectedElements = document.querySelectorAll('.back-button, img, a');
             protectedElements.forEach(el => {
-                el.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    return false;
-                });
+                el.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; });
+            });
+
+            // 2. SCROLL EFFECT
+            const header = document.querySelector(".static-header");
+            window.addEventListener("scroll", () => {
+                header.classList.toggle("scrolled", window.scrollY > 10);
             });
         });
     </script>
