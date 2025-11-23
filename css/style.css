@@ -339,6 +339,7 @@ header nav {
 .channel-logo {
     flex-shrink: 0;
     height: 40px;
+    filter: grayscale(100%);
     object-fit: contain;
     pointer-events: none;
     width: 40px;
@@ -515,6 +516,7 @@ header nav {
 
 .minimized-logo {
     background: transparent;
+    filter: grayscale(100%);
     border-radius: 4px;
     height: 35px;
     object-fit: contain;
