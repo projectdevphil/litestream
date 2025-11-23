@@ -17,7 +17,6 @@
 <body>
     <div class="static-page-container">
         <header class="static-header">
-            <!-- Updated link to go back to Home -->
             <a href="/litestream" class="back-button" aria-label="Back to Litestream">
                 <span class="material-symbols-rounded">arrow_back</span>
             </a>
@@ -66,6 +65,16 @@
         </main>
     </div>
 
-    <script src="js/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const protectedElements = document.querySelectorAll('.back-button, .social-icon-links a, .developer-section a, img');
+            protectedElements.forEach(el => {
+                el.addEventListener('contextmenu', (e) => {
+                    e.preventDefault(); // Stops the menu from appearing
+                    return false;
+                });
+            });
+        });
+    </script>
 </body>
 </html>
