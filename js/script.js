@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const spinner = document.getElementById("spinner");
     const loadMoreContainer = document.getElementById("load-more-container");
     const loadMoreBtn = document.getElementById("load-more-btn");
-    const channelHeader = document.getElementById("channel-list-header");
     
     const playerView = document.getElementById('player-view');
     const videoElement = document.getElementById('video');
@@ -40,18 +39,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentFilteredStreams = [];
     let currentlyDisplayedCount = 0;
 
-    // --- [NEW] HELPER: CREATE URL SLUG ---
-    // Turns "GMA 7" into "gma-7" for the URL
+    // --- SAVE DEFAULT TITLE ---
+    const defaultPageTitle = document.title; 
+
+    // --- HELPER: CREATE URL SLUG ---
     const createSlug = (name) => {
         if (!name) return '';
         return name.toString().toLowerCase()
             .trim()
-            .replace(/\s+/g, '-')           // Replace spaces with -
-            .replace(/[^\w\-]+/g, '')       // Remove non-word chars
-            .replace(/\-\-+/g, '-');        // Replace multiple - with single -
+            .replace(/\s+/g, '-')           
+            .replace(/[^\w\-]+/g, '')       
+            .replace(/\-\-+/g, '-');        
     };
 
-    // --- 1. RENDER MENU ---
+    // --- 1. RENDER MENU (UPDATED) ---
     const renderMenu = () => {
         if (!floatingMenu) return;
         floatingMenu.innerHTML = `
@@ -62,6 +63,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             <li><a href="/litestream/terms"><span class="material-symbols-rounded">gavel</span> Terms of Service</a></li>
             <li><a href="/stream-tester"><span class="material-symbols-rounded">labs</span> Stream Tester</a></li>            
         </ul>`;
+
+        // [NEW] DISABLE LONG PRESS / HARD PRESS MENU
+        const menuLinks = floatingMenu.querySelectorAll('a');
+        menuLinks.forEach(link => {
+            // 1. Prevent Right Click / Long Press Context Menu
+            link.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                return false;
+            });
+
+            // 2. CSS Styles to prevent selection and iOS callouts
+            link.style.userSelect = 'none';              // Prevent text selection
+            link.style.webkitUserSelect = 'none';        // Safari/Chrome
+            link.style.webkitTouchCallout = 'none';      // iOS Safari (Disables link preview/menu)
+        });
     };
 
     // --- 2. INIT PLAYER ---
@@ -71,7 +87,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (shaka.Player.isBrowserSupported()) {
             player = new shaka.Player(videoElement);
             
-            // Initialize UI overlay (Standard Position)
             try {
                 ui = new shaka.ui.Overlay(player, playerWrapper, videoElement);
             } catch (e) {
@@ -102,7 +117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 2. Update Info
         mainPlayerName.textContent = stream.name;
-        updateStatusText("Connecting...", "var(--theme-color)"); // Blue while loading
+        updateStatusText("Connecting...", "var(--theme-color)");
 
         if(miniPlayerName) miniPlayerName.textContent = stream.name;
         
@@ -111,11 +126,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             miniPlayerLogo.style.display = 'block'; 
         }
 
-        // --- [NEW] UPDATE URL BAR ---
-        // Changes URL to /?channel=channel-slug
+        // --- UPDATE URL & TITLE ---
         const slug = createSlug(stream.name);
         const newUrl = `${window.location.pathname}?channel=${slug}`;
         window.history.pushState({ path: newUrl }, '', newUrl);
+        
+        document.title = `${stream.name} - Litestream`;
 
         // 3. Init Player
         if (!player) {
@@ -181,9 +197,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(minimizedPlayer) minimizedPlayer.classList.remove('active');
         document.body.classList.remove('no-scroll');
 
-        // --- [NEW] RESET URL ---
-        // Removes the query param when player closes
         window.history.pushState({}, '', window.location.pathname);
+        document.title = defaultPageTitle;
     };
 
     // --- 5. FETCH & RENDER ---
@@ -298,19 +313,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentFilteredStreams = [...allStreams];
     renderChannels(true);
 
-    // --- [NEW] AUTO PLAY FROM URL ---
-    // 1. Get the parameters from the URL (e.g. ?channel=kapamilya-channel)
+    // --- AUTO PLAY FROM URL ---
     const urlParams = new URLSearchParams(window.location.search);
     const channelSlug = urlParams.get('channel');
 
-    // 2. If a channel parameter exists
     if (channelSlug) {
-        // 3. Search the loaded streams for a match
         const foundChannel = allStreams.find(s => createSlug(s.name) === channelSlug);
         
         if (foundChannel) {
-            // 4. Play it immediately
-            console.log("URL Link detected for:", foundChannel.name);
+            console.log("Playing from URL:", foundChannel.name);
             openPlayer(foundChannel);
         }
     }
