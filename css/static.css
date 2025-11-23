@@ -147,9 +147,10 @@ hr {
 }
 
 .developer-section {
-    display: inline-block;
+    display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start; 
+    text-align: left;
 }
 
 .developer-logo {
@@ -158,6 +159,7 @@ hr {
     max-width: 150px;
     opacity: 0.9;
     pointer-events: none;
+    margin-left: 0; 
 }
 
 .content-card h2 .material-symbols-rounded {
