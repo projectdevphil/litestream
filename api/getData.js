@@ -34,7 +34,7 @@ export default function handler(req, res) {
     const { channel } = req.query;
 
     if (!channel) {
-        return res.status(400).send("Required Channel Name");
+        return res.status(400).send("Thank you, but nothing here!");
     }
 
     const foundChannel = channels.find(c => c.name.toLowerCase() === channel.toLowerCase());
