@@ -1,54 +1,41 @@
 document.addEventListener('DOMContentLoaded', async () => {
     
-    // --- CONFIGURATION ---
     const API_GET_CHANNELS = '/api/getChannels';
     const API_GET_DATA = '/api/getData';
     const CHANNELS_PER_PAGE = 50;
-    const BASE_URL_PATH = '/home'; // Forces the URL to look like /home
-
-    // --- ASSETS ---
+    const BASE_URL_PATH = '/home';
     const POSTER_MOBILE = '/assets/poster/mobile.png';
     const POSTER_DESKTOP = '/assets/poster/desktop.png';
-
-    // --- SELECTORS ---
     const header = document.querySelector("header");
     const menuBtn = document.getElementById("menu-btn");
     const floatingMenu = document.getElementById("floating-menu");
-    
     const searchContainer = document.getElementById("search-container");
     const searchToggle = document.getElementById("search-toggle");
     const searchInput = document.getElementById("search-input");
-    
     const channelListingsContainer = document.querySelector(".channel-list");
     const spinner = document.getElementById("spinner");
     const loadMoreContainer = document.getElementById("load-more-container");
     const loadMoreBtn = document.getElementById("load-more-btn");
-    
     const channelHeader = document.getElementById("channel-list-header") || document.querySelector(".section-header h2"); 
-    
     const playerView = document.getElementById('player-view');
     const videoElement = document.getElementById('video');
     const playerWrapper = document.getElementById('video-container'); 
     const minimizeBtn = document.getElementById('minimize-player-btn');
     const minimizedPlayer = document.getElementById('minimized-player');
     const exitBtn = document.getElementById('exit-player-btn');
-
-    // Text Elements
     const mainPlayerName = document.getElementById('player-channel-name');
     const mainPlayerStatus = document.getElementById('player-channel-status');
     const miniPlayerName = document.getElementById('minimized-player-name');
     const miniPlayerStatus = document.getElementById('minimized-player-status');
     const miniPlayerLogo = document.getElementById("minimized-player-logo");
 
-    // --- VARIABLES ---
     let player = null;
     let ui = null;
     let allStreams = [];
     let currentFilteredStreams = [];
     let currentlyDisplayedCount = 0;
+    
     const defaultPageTitle = document.title; 
-
-    // --- HELPER: CREATE URL SLUG ---
     const createSlug = (name) => {
         if (!name) return '';
         return name.toString().toLowerCase()
@@ -57,8 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .replace(/[^\w\-]+/g, '')       
             .replace(/\-\-+/g, '-');        
     };
-
-    // --- POSTER LOGIC ---
+    
     const setResponsivePoster = () => {
         if (!videoElement) return;
         const isDesktop = window.innerWidth > 1024; 
@@ -68,7 +54,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     setResponsivePoster();
     window.addEventListener('resize', setResponsivePoster);
 
-    // --- 1. RENDER MENU (Updated Links) ---
     const renderMenu = () => {
         if (!floatingMenu) return;
         floatingMenu.innerHTML = `
@@ -87,7 +72,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    // --- 2. INIT PLAYER ---
     const initPlayer = async () => {
         shaka.polyfill.installAll();
         if (shaka.Player.isBrowserSupported()) {
@@ -110,36 +94,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // --- 3. OPEN PLAYER (SECURE FETCH) ---
     const openPlayer = async (publicStreamInfo) => {
-        // 1. Show UI
         if (playerView) {
             playerView.classList.add('active');
             document.body.classList.add('no-scroll');
             if (minimizedPlayer) minimizedPlayer.classList.remove('active');
         }
 
-        // 2. Set Info Immediately
         mainPlayerName.textContent = publicStreamInfo.name;
         const groupTitle = publicStreamInfo.group || "Live Stream"; 
         updateStatusText("Loading...", "var(--theme-color)"); 
 
         if(miniPlayerName) miniPlayerName.textContent = publicStreamInfo.name;
         if(miniPlayerLogo) {
-            miniPlayerLogo.src = publicStreamInfo.logo || '/assets/favicon.png';
+            miniPlayerLogo.src = publicStreamInfo.logo || '/assets/favicon.svg';
             miniPlayerLogo.style.display = 'block'; 
         }
 
-        // --- UPDATE URL (Shareable Link) ---
-        // Forces URL to be /home?channel=slug
         const slug = createSlug(publicStreamInfo.name);
         const newUrl = `${BASE_URL_PATH}?channel=${slug}`;
         window.history.pushState({ path: newUrl }, '', newUrl);
         document.title = `${publicStreamInfo.name} - Litestream`;
 
-        // 3. FETCH SECURE DATA
         try {
-            // Call the Protected API
             const res = await fetch(`${API_GET_DATA}?channel=${encodeURIComponent(publicStreamInfo.name)}`);
             
             if (res.status === 400 || res.status === 404) {
@@ -148,13 +125,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const secureData = await res.json();
 
-            // 4. Init Player
             if (!player) {
                 const success = await initPlayer();
                 if (!success) return;
             }
 
-            // 5. Configure DRM / ClearKey
             const config = { drm: { servers: {}, clearKeys: {} } };
             
             if (secureData.ClearKey && secureData.ClearKey.k1 && secureData.ClearKey.k2) {
@@ -162,7 +137,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             player.configure(config);
 
-            // 6. Load & Play
             if (ui) ui.setEnabled(true);
             await player.unload();
             await player.load(secureData.manifestUri);
@@ -187,7 +161,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // --- 4. UI ACTIONS ---
     const minimizePlayer = () => {
         if (playerView.classList.contains('active')) {
             playerView.classList.remove('active');
@@ -211,12 +184,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(minimizedPlayer) minimizedPlayer.classList.remove('active');
         document.body.classList.remove('no-scroll');
 
-        // Reset URL to clean /home
         window.history.pushState({}, '', BASE_URL_PATH);
         document.title = defaultPageTitle;
     };
 
-    // --- 5. FETCH CHANNELS (Public List) ---
     async function fetchChannels() {
         spinner.style.display = 'flex';
         try {
@@ -241,7 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         slice.forEach(stream => {
             const item = document.createElement('div');
             item.className = 'channel-list-item';
-            const logo = stream.logo || '/assets/favicon.png';
+            const logo = stream.logo || '/assets/favicon.svg';
             
             item.innerHTML = `
                 <div class="channel-info-left">
@@ -265,7 +236,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // --- 6. SLIDER ---
     const setupSlider = () => {
         const slider = document.querySelector(".slider");
         if (!slider) return;
@@ -294,7 +264,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    // --- 7. STARTUP & LISTENERS ---
     renderMenu();
     setupSlider();
 
@@ -334,29 +303,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         header.classList.toggle("scrolled", window.scrollY > 10);
     });
 
-    // --- INITIALIZATION SEQUENCE ---
-    // 1. Fetch Public List
     allStreams = await fetchChannels();
     currentFilteredStreams = [...allStreams];
     renderChannels(true);
 
-    // 2. Check URL for ?channel=...
     const urlParams = new URLSearchParams(window.location.search);
     const channelSlug = urlParams.get('channel');
     let hasPlayedLink = false;
 
     if (channelSlug) {
-        // Find public data locally first
         const foundChannel = allStreams.find(s => createSlug(s.name) === channelSlug);
         if (foundChannel) {
             console.log("Deep link detected for:", foundChannel.name);
-            // This triggers openPlayer which triggers API/getData
             openPlayer(foundChannel);
             hasPlayedLink = true;
         }
     }
 
-    // 3. Desktop Mode Default (if no deep link)
     if (!hasPlayedLink && window.innerWidth > 1024) {
         if (playerView) {
             playerView.classList.add('active');
