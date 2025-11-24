@@ -362,8 +362,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             playerView.classList.add('active');
             document.body.classList.add('no-scroll');
         }
-        if (mainPlayerName) mainPlayerName.textContent = "Litestream";
-        updateStatusText("Select a Channel", "var(--text-color)");
+        if (mainPlayerName) mainPlayerName.textContent = "Select a Channel";
+        updateStatusText("", "var(--text-color)");
         if(videoElement) videoElement.poster = POSTER_DESKTOP;
     }
 });
