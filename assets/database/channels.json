@@ -32,6 +32,12 @@
     "k2": "3de28411cf08a64ea935b9578f6d0edd"
   },
   {
+    "name": "GMA7",
+    "logo": "https://static.wikia.nocookie.net/logopedia/images/a/aa/GMA_Network_2024_logo.png",
+    "group": "General",
+    "manifestUri": "https://converse.nathcreqtives.com/1093/manifest.mpd"
+  },
+  {
     "name": "RPTV",
     "logo": "https://upload.wikimedia.org/wikipedia/commons/5/5b/RPTV_%282024%29.svg",
     "group": "General",
