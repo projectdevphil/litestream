@@ -8,7 +8,7 @@
     --glass-border: 1px solid rgba(255, 255, 255, 0.1);
     --text-color: #ffffff;
     --text-secondary: #b3b3b3;
-    --theme-color: #ffffff; /* Original Blue Accent */
+    --theme-color: #ffffff;
 }
 
 body {
@@ -47,7 +47,6 @@ button {
     padding: 0;
 }
 
-/* Header */
 header {
     align-items: center;
     backdrop-filter: none;
@@ -104,7 +103,6 @@ header nav {
     background: rgba(255,255,255,0.1);
 }
 
-/* Search */
 .search-container {
     display: flex;
     align-items: center;
@@ -138,7 +136,6 @@ header nav {
     margin-right: 5px;
 }
 
-/* Floating Menu */
 .floating-menu {
     backdrop-filter: blur(20px);
     background: var(--glass-bg);
@@ -189,7 +186,6 @@ header nav {
     width: 100%;
 }
 
-/* Featured Slider */
 .featured-slider {
     margin: 20px;
     position: relative;
@@ -289,7 +285,6 @@ header nav {
     border-radius: 20px;
 }
 
-/* Channel List */
 .section-header {
     font-size: 1rem;
     font-weight: 700;
@@ -366,11 +361,10 @@ header nav {
     font-size: 22px;
 }
 
-/* --- PLAYER VIEW --- */
 .player-view {
     -webkit-backdrop-filter: blur(30px);
     backdrop-filter: blur(30px);
-    background: var(--glass-bg); /* Glass background as requested */
+    background: var(--glass-bg);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -380,10 +374,8 @@ header nav {
     padding: 20px;
     position: fixed;
     top: 0;
-    
-    /* Logic for hiding/showing */
     transform: translateY(100%);
-    visibility: hidden; /* Prevents clicks when hidden */
+    visibility: hidden;
     transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.5s;
     width: 100%;
     z-index: 2000;
@@ -392,7 +384,7 @@ header nav {
 .player-view.active {
     transform: translateY(0);
     visibility: visible;
-    transition-delay: 0s; /* Show immediately */
+    transition-delay: 0s;
 }
 
 .player-header {
@@ -401,7 +393,6 @@ header nav {
     width: 100%;
 }
 
-/* Video Container (Shaka Friendly) */
 .video-player-container {
     aspect-ratio: 16 / 9;
     background-color: #000;
@@ -410,7 +401,7 @@ header nav {
     max-width: 960px;
     width: 100%;
     position: relative;
-    overflow: hidden; /* Ensures rounded corners clip video */
+    overflow: hidden;
 }
 
 .shaka-video-container,
@@ -460,7 +451,6 @@ header nav {
     margin: 0;
 }
 
-/* This is the Status Text (Now Playing) */
 .player-info-left p {
     color: var(--theme-color);
     font-size: 0.8rem;
@@ -477,7 +467,6 @@ header nav {
     gap: 2px;
 }
 
-/* Minimized Player */
 .minimized-player {
     -webkit-backdrop-filter: blur(20px);
     align-items: center;
@@ -520,7 +509,7 @@ header nav {
     height: 50px;
     object-fit: contain;
     width: 60px;
-    display: block; /* Ensure it displays */
+    display: block;
 }
 
 .minimized-info h4 {
@@ -561,7 +550,6 @@ header nav {
     font-weight: 800;
 }
 
-/* Utilities */
 .spinner-container {
     display: flex;
     justify-content: center;
