@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const BASE_URL_PATH = '/home';
     const POSTER_MOBILE = '/assets/poster/mobile.png';
     const POSTER_DESKTOP = '/assets/poster/desktop.png';
+    
     const header = document.querySelector("header");
     const menuBtn = document.getElementById("menu-btn");
     const floatingMenu = document.getElementById("floating-menu");
