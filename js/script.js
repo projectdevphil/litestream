@@ -1,18 +1,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
     
-    // ==========================================
-    // CONFIGURATION
-    // ==========================================
     const API_GET_CHANNELS = '/api/getChannels';
     const API_GET_DATA = '/api/getData';
     const CHANNELS_PER_PAGE = 50;
     const BASE_URL_PATH = '/home';
     const POSTER_MOBILE = '/assets/poster/mobile.png';
     const POSTER_DESKTOP = '/assets/poster/desktop.png';
-
-    // ==========================================
-    // DOM ELEMENTS
-    // ==========================================
     const header = document.querySelector("header");
     const menuBtn = document.getElementById("menu-btn");
     const floatingMenu = document.getElementById("floating-menu");
@@ -36,9 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const miniPlayerStatus = document.getElementById('minimized-player-status');
     const miniPlayerLogo = document.getElementById("minimized-player-logo");
 
-    // ==========================================
-    // STATE VARIABLES
-    // ==========================================
     let player = null;
     let ui = null;
     let allStreams = [];
@@ -46,10 +36,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentlyDisplayedCount = 0;
     
     const defaultPageTitle = document.title; 
-
-    // ==========================================
-    // HELPER FUNCTIONS
-    // ==========================================
     const createSlug = (name) => {
         if (!name) return '';
         return name.toString().toLowerCase()
@@ -97,10 +83,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // ==========================================
-    // SHAKA PLAYER
-    // ==========================================
-
     const initPlayer = async () => {
         shaka.polyfill.installAll();
         if (shaka.Player.isBrowserSupported()) {
@@ -122,10 +104,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             return false;
         }
     };
-
-    // ==========================================
-    // OPEN PLAYER WORKFLOW
-    // ==========================================
 
     const openPlayer = async (publicStreamInfo) => {
         if (playerView) {
@@ -228,10 +206,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.title = defaultPageTitle;
     };
 
-    // ==========================================
-    // LISTINGS & EVENTS
-    // ==========================================
-
     async function fetchChannels() {
         spinner.style.display = 'flex';
         try {
@@ -307,10 +281,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
     };
-
-    // ==========================================
-    // BOOT
-    // ==========================================
 
     renderMenu();
     setupSlider();
