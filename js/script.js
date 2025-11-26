@@ -1,11 +1,19 @@
 document.addEventListener('DOMContentLoaded', async () => {
     
+    // ==========================================
+    // CONFIGURATION
+    // ==========================================
+    const AD_URL = '/assets/ads/boots-trailer.mp4'; // Your 2:13 ad
     const API_GET_CHANNELS = '/api/getChannels';
     const API_GET_DATA = '/api/getData';
     const CHANNELS_PER_PAGE = 50;
     const BASE_URL_PATH = '/home';
     const POSTER_MOBILE = '/assets/poster/mobile.png';
     const POSTER_DESKTOP = '/assets/poster/desktop.png';
+
+    // ==========================================
+    // DOM ELEMENTS
+    // ==========================================
     const header = document.querySelector("header");
     const menuBtn = document.getElementById("menu-btn");
     const floatingMenu = document.getElementById("floating-menu");
@@ -29,13 +37,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const miniPlayerStatus = document.getElementById('minimized-player-status');
     const miniPlayerLogo = document.getElementById("minimized-player-logo");
 
+    // ==========================================
+    // STATE VARIABLES
+    // ==========================================
     let player = null;
     let ui = null;
     let allStreams = [];
     let currentFilteredStreams = [];
     let currentlyDisplayedCount = 0;
+    let isAdPlaying = false; // Tracks if ad is currently active
     
     const defaultPageTitle = document.title; 
+
+    // ==========================================
+    // HELPER FUNCTIONS
+    // ==========================================
     const createSlug = (name) => {
         if (!name) return '';
         return name.toString().toLowerCase()
@@ -72,6 +88,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
+    function updateStatusText(text, color) {
+        if(mainPlayerStatus) {
+            mainPlayerStatus.textContent = text;
+            mainPlayerStatus.style.color = color;
+        }
+        if(miniPlayerStatus) {
+            miniPlayerStatus.textContent = text;
+            miniPlayerStatus.style.color = color;
+        }
+    }
+
+    // ==========================================
+    // SHAKA PLAYER & AD LOGIC
+    // ==========================================
+
     const initPlayer = async () => {
         shaka.polyfill.installAll();
         if (shaka.Player.isBrowserSupported()) {
@@ -94,7 +125,60 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    /**
+     * Plays the MP4 ad and waits for it to finish.
+     * Guaranteed to work for any duration (2 seconds or 2 minutes).
+     */
+    const playAd = async () => {
+        // 1. Unload Shaka if it's active
+        if (player) {
+            await player.unload();
+        }
+        
+        // 2. Hide Shaka UI (spinner, controls) so they don't block the ad
+        if (ui) ui.setEnabled(false);
+
+        updateStatusText("Advertisement", "yellow");
+        isAdPlaying = true;
+
+        return new Promise((resolve) => {
+            const onAdEnded = () => {
+                console.log("Ad finished normally");
+                cleanUpAdListeners();
+                resolve();
+            };
+
+            const onAdError = (e) => {
+                console.warn("Ad failed to load/play, skipping to live stream...", e);
+                cleanUpAdListeners();
+                resolve(); 
+            };
+
+            const cleanUpAdListeners = () => {
+                isAdPlaying = false;
+                videoElement.removeEventListener('ended', onAdEnded);
+                videoElement.removeEventListener('error', onAdError);
+            };
+
+            // 3. Set the video source to the Ad
+            videoElement.src = AD_URL;
+            videoElement.loop = false;
+            videoElement.controls = false; // Disable controls during ad
+            
+            videoElement.addEventListener('ended', onAdEnded);
+            videoElement.addEventListener('error', onAdError);
+
+            // 4. Attempt to play
+            videoElement.play().catch(e => {
+                console.log("Browser blocked autoplay:", e);
+                cleanUpAdListeners();
+                resolve(); // Skip ad if browser blocks it
+            });
+        });
+    };
+
     const openPlayer = async (publicStreamInfo) => {
+        // --- 1. OPEN UI ---
         if (playerView) {
             playerView.classList.add('active');
             document.body.classList.add('no-scroll');
@@ -103,8 +187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         mainPlayerName.textContent = publicStreamInfo.name;
         const groupTitle = publicStreamInfo.group || "Live Stream"; 
-        updateStatusText("Loading...", "var(--theme-color)"); 
-
+        
         if(miniPlayerName) miniPlayerName.textContent = publicStreamInfo.name;
         if(miniPlayerLogo) {
             miniPlayerLogo.src = publicStreamInfo.logo || '/assets/favicon.svg';
@@ -116,6 +199,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.history.pushState({ path: newUrl }, '', newUrl);
         document.title = `${publicStreamInfo.name} - Litestream`;
 
+        // --- 2. PLAY AD (Wait for 2:13s or 'ended' event) ---
+        await playAd();
+
+        // --- 3. CHECK IF USER CLOSED PLAYER ---
+        if (!playerView.classList.contains('active')) return;
+
+        // --- 4. PREPARE FOR LIVE STREAM ---
+        updateStatusText("Loading Stream...", "var(--theme-color)"); 
+
+        // CRITICAL FIX: Reset video element to remove MP4 trace
+        videoElement.removeAttribute('src'); 
+        videoElement.load(); 
+
         try {
             const res = await fetch(`${API_GET_DATA}?channel=${encodeURIComponent(publicStreamInfo.name)}`);
             
@@ -125,6 +221,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const secureData = await res.json();
 
+            // Initialize Shaka if not ready
             if (!player) {
                 const success = await initPlayer();
                 if (!success) return;
@@ -137,9 +234,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             player.configure(config);
 
+            // Re-enable Shaka UI now that Ad is gone
             if (ui) ui.setEnabled(true);
-            await player.unload();
+
             await player.load(secureData.manifestUri);
+            
             videoElement.play().catch(() => console.log("Auto-play blocked"));
             
             updateStatusText(groupTitle, "var(--theme-color)");
@@ -149,17 +248,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateStatusText("Failed to Load", "red");
         }
     };
-
-    function updateStatusText(text, color) {
-        if(mainPlayerStatus) {
-            mainPlayerStatus.textContent = text;
-            mainPlayerStatus.style.color = color;
-        }
-        if(miniPlayerStatus) {
-            miniPlayerStatus.textContent = text;
-            miniPlayerStatus.style.color = color;
-        }
-    }
 
     const minimizePlayer = () => {
         if (playerView.classList.contains('active')) {
@@ -179,7 +267,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const closePlayer = async () => {
+        // --- SAFE EXIT LOGIC ---
+        // 1. Force stop the Ad
+        isAdPlaying = false;
+        videoElement.pause();
+        videoElement.removeAttribute('src'); 
+        videoElement.load(); // Clears buffer
+
+        // 2. Unload Shaka
         if (player) await player.unload();
+        
+        // 3. Close UI
         if(playerView) playerView.classList.remove('active');
         if(minimizedPlayer) minimizedPlayer.classList.remove('active');
         document.body.classList.remove('no-scroll');
@@ -187,6 +285,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.history.pushState({}, '', BASE_URL_PATH);
         document.title = defaultPageTitle;
     };
+
+    // ==========================================
+    // CHANNEL LISTINGS & UI EVENTS
+    // ==========================================
 
     async function fetchChannels() {
         spinner.style.display = 'flex';
@@ -264,6 +366,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
+
     renderMenu();
     setupSlider();
 
@@ -303,6 +409,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         header.classList.toggle("scrolled", window.scrollY > 10);
     });
 
+    // --- Boot Sequence ---
     allStreams = await fetchChannels();
     currentFilteredStreams = [...allStreams];
     renderChannels(true);
