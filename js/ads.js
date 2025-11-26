@@ -56,6 +56,7 @@
             visitBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 22px; line-height: 0; font-variation-settings: \'wght\' 500;">open_in_new</span>';
             visitBtn.style.cssText = btnStyle;
             visitBtn.title = "Visit Link";
+            
             skipBtn = document.createElement("button");
             skipBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 26px; line-height: 0; font-variation-settings: \'wght\' 500;">skip_next</span>';
             skipBtn.style.cssText = btnStyle;
@@ -108,6 +109,14 @@
         timerDisplay.style.display = 'block';
         timerDisplay.textContent = "Loading Ad...";
 
+        const preventContextMenu = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        };
+        videoElement.addEventListener('contextmenu', preventContextMenu);
+        videoElement.setAttribute('controlsList', 'nodownload');
+
         return new Promise((resolve) => {
             
             const finishAd = () => {
@@ -115,6 +124,8 @@
                 videoElement.removeEventListener('error', onError);
                 videoElement.removeEventListener('timeupdate', onTimeUpdate);
                 
+                videoElement.removeEventListener('contextmenu', preventContextMenu);
+
                 if (skipBtn) skipBtn.onclick = null;
                 if (visitBtn) visitBtn.onclick = null;
 
@@ -151,11 +162,14 @@
             videoElement.loop = false;
             videoElement.controls = false;
             videoElement.muted = false; 
+
             videoElement.addEventListener('ended', finishAd);
             videoElement.addEventListener('error', onError);
             videoElement.addEventListener('timeupdate', onTimeUpdate);
+
             skipBtn.onclick = onSkipClicked;
             visitBtn.onclick = onVisitClicked;
+
             videoElement.play().catch(e => {
                 console.log("Ad Autoplay Blocked:", e);
                 finishAd();
