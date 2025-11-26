@@ -1,8 +1,7 @@
 (function() {
     const AD_CONFIG = {
         videoUrl: '/assets/ads/boots-trailer.mp4',
-        linkUrl: 'https://www.netflix.com/ph-en/title/81427990?preventIntent=true',
-        skipText: 'Skip Ad'
+        linkUrl: 'https://www.netflix.com/ph-en/title/81427990?preventIntent=true'
     };
 
     let adContainer = null;
@@ -30,23 +29,21 @@
             adContainer.id = "ad-controls-right";
             adContainer.style.cssText = `
                 position: absolute;
-                bottom: 25px;
-                right: 25px;
+                bottom: 20px;
+                right: 20px;
                 display: none;
-                gap: 12px;
+                gap: 10px;
                 z-index: 9999;
                 align-items: center;
             `;
 
-            visitBtn = document.createElement("button");
-            visitBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 20px; line-height: 0;">open_in_new</span>';
-            visitBtn.style.cssText = `
+            const btnStyle = `
                 background-color: #FFFFFF;
                 color: #000000;
                 border: none;
                 border-radius: 50%;
-                width: 40px;
-                height: 40px;
+                width: 38px;
+                height: 38px;
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -55,25 +52,17 @@
                 transition: transform 0.2s ease, background-color 0.2s;
             `;
 
+            visitBtn = document.createElement("button");
+            visitBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 22px; line-height: 0;">open_in_new</span>';
+            visitBtn.style.cssText = btnStyle;
+            visitBtn.title = "Visit Link";
             skipBtn = document.createElement("button");
-            skipBtn.textContent = AD_CONFIG.skipText;
-            skipBtn.style.cssText = `
-                background-color: #FFFFFF;
-                color: #000000;
-                border: none;
-                border-radius: 50px;
-                padding: 0 24px;
-                height: 40px;
-                font-weight: 700;
-                font-size: 14px;
-                cursor: pointer;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-                font-family: inherit;
-                transition: transform 0.2s ease, background-color 0.2s;
-            `;
+            skipBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 26px; line-height: 0;">skip_next</span>';
+            skipBtn.style.cssText = btnStyle;
+            skipBtn.title = "Skip Ad";
 
             const addHover = (btn) => {
-                btn.onmouseover = () => { btn.style.transform = "scale(1.05)"; btn.style.backgroundColor = "#f0f0f0"; };
+                btn.onmouseover = () => { btn.style.transform = "scale(1.1)"; btn.style.backgroundColor = "#f0f0f0"; };
                 btn.onmouseout = () => { btn.style.transform = "scale(1)"; btn.style.backgroundColor = "#FFFFFF"; };
             };
             addHover(visitBtn);
@@ -90,24 +79,24 @@
             timerDisplay.textContent = "Ad • 0:00";
             timerDisplay.style.cssText = `
                 position: absolute;
-                bottom: 25px;
-                left: 25px;
+                bottom: 20px;
+                left: 20px;
                 display: none;
                 background-color: rgba(0, 0, 0, 0.6);
                 color: #FFFFFF;
-                padding: 8px 16px;
-                border-radius: 4px;
+                padding: 8px;
+                border-radius: 15px;
                 font-weight: 700;
                 font-size: 14px;
                 font-family: inherit;
-                pointer-events: none; /* User can't click it */
+                pointer-events: none;
                 z-index: 9999;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             `;
             playerWrapper.appendChild(timerDisplay);
         }
     }
-    
+
     window.playVideoAd = async function(videoElement, playerWrapper, shakaPlayer, shakaUI, statusCallback) {
         createAdUI(playerWrapper);
 
@@ -128,6 +117,7 @@
                 
                 if (skipBtn) skipBtn.onclick = null;
                 if (visitBtn) visitBtn.onclick = null;
+
                 adContainer.style.display = 'none';
                 timerDisplay.style.display = 'none';
 
@@ -153,7 +143,6 @@
             const onTimeUpdate = () => {
                 if(videoElement.duration) {
                     const remaining = videoElement.duration - videoElement.currentTime;
-                    // Formats to "Ad: 2:13" then counts down
                     timerDisplay.textContent = "Ad • " + formatTime(remaining);
                 }
             };
