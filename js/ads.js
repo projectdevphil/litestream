@@ -53,11 +53,11 @@
             `;
 
             visitBtn = document.createElement("button");
-            visitBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 30px; line-height: 0;">open_in_new</span>';
+            visitBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 22px; line-height: 0; font-variation-settings: \'wght\' 700;">open_in_new</span>';
             visitBtn.style.cssText = btnStyle;
             visitBtn.title = "Visit Link";
             skipBtn = document.createElement("button");
-            skipBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 30px; line-height: 0;">skip_next</span>';
+            skipBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 26px; line-height: 0; font-variation-settings: \'wght\' 700;">skip_next</span>';
             skipBtn.style.cssText = btnStyle;
             skipBtn.title = "Skip Ad";
 
