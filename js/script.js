@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
     
     // ==========================================
-    // CONFIGURATION
+    // 1. CONFIGURATION
     // ==========================================
-    const AD_URL = '/assets/ads/boots-trailer.mp4'; // Your 2:13 ad
+    const AD_URL = '/assets/ads/boots-trailer.mp4'; 
     const API_GET_CHANNELS = '/api/getChannels';
     const API_GET_DATA = '/api/getData';
     const CHANNELS_PER_PAGE = 50;
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const POSTER_DESKTOP = '/assets/poster/desktop.png';
 
     // ==========================================
-    // DOM ELEMENTS
+    // 2. DOM ELEMENTS
     // ==========================================
     const header = document.querySelector("header");
     const menuBtn = document.getElementById("menu-btn");
@@ -38,19 +38,52 @@ document.addEventListener('DOMContentLoaded', async () => {
     const miniPlayerLogo = document.getElementById("minimized-player-logo");
 
     // ==========================================
-    // STATE VARIABLES
+    // 3. CREATE SKIP AD BUTTON
+    // ==========================================
+    const skipBtn = document.createElement("button");
+    skipBtn.textContent = "Skip Ad"; 
+    skipBtn.style.cssText = `
+        position: absolute;
+        bottom: 25px;
+        right: 25px;
+        background-color: #FFFFFF;
+        color: #000000;
+        border: none;
+        border-radius: 50px;
+        padding: 10px 24px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        z-index: 9999; /* Highest layer */
+        display: none; /* Hidden by default */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        font-family: inherit;
+        transition: transform 0.2s ease, background-color 0.2s;
+    `;
+    
+    // Hover Effects
+    skipBtn.onmouseover = () => { skipBtn.style.transform = "scale(1.05)"; skipBtn.style.backgroundColor = "#f0f0f0"; };
+    skipBtn.onmouseout = () => { skipBtn.style.transform = "scale(1)"; skipBtn.style.backgroundColor = "#FFFFFF"; };
+
+    // Inject into DOM
+    if (playerWrapper) {
+        playerWrapper.style.position = "relative"; // Required for absolute positioning of child
+        playerWrapper.appendChild(skipBtn);
+    }
+
+    // ==========================================
+    // 4. STATE VARIABLES
     // ==========================================
     let player = null;
     let ui = null;
     let allStreams = [];
     let currentFilteredStreams = [];
     let currentlyDisplayedCount = 0;
-    let isAdPlaying = false; // Tracks if ad is currently active
     
     const defaultPageTitle = document.title; 
 
     // ==========================================
-    // HELPER FUNCTIONS
+    // 5. HELPER FUNCTIONS
     // ==========================================
     const createSlug = (name) => {
         if (!name) return '';
@@ -100,7 +133,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ==========================================
-    // SHAKA PLAYER & AD LOGIC
+    // 6. SHAKA PLAYER INITIALIZATION
     // ==========================================
 
     const initPlayer = async () => {
@@ -125,60 +158,73 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    /**
-     * Plays the MP4 ad and waits for it to finish.
-     * Guaranteed to work for any duration (2 seconds or 2 minutes).
-     */
+    // ==========================================
+    // 7. AD LOGIC (Robust)
+    // ==========================================
+
     const playAd = async () => {
-        // 1. Unload Shaka if it's active
+        // Unload Shaka first
         if (player) {
             await player.unload();
         }
         
-        // 2. Hide Shaka UI (spinner, controls) so they don't block the ad
+        // Hide Shaka UI to prevent conflicts
         if (ui) ui.setEnabled(false);
 
         updateStatusText("Advertisement", "yellow");
-        isAdPlaying = true;
+        
+        // Show Skip Button
+        skipBtn.style.display = 'block';
 
         return new Promise((resolve) => {
-            const onAdEnded = () => {
-                console.log("Ad finished normally");
-                cleanUpAdListeners();
+            // Function to run when ad is done/skipped
+            const finishAd = () => {
+                // Cleanup Listeners
+                videoElement.removeEventListener('ended', finishAd);
+                videoElement.removeEventListener('error', finishAd);
+                skipBtn.onclick = null;
+                
+                // Hide Button
+                skipBtn.style.display = 'none';
+                
+                // Resolve Promise
                 resolve();
             };
 
-            const onAdError = (e) => {
-                console.warn("Ad failed to load/play, skipping to live stream...", e);
-                cleanUpAdListeners();
-                resolve(); 
+            const onSkipClicked = (e) => {
+                if(e) e.stopPropagation();
+                console.log("User Skipped Ad");
+                finishAd();
             };
 
-            const cleanUpAdListeners = () => {
-                isAdPlaying = false;
-                videoElement.removeEventListener('ended', onAdEnded);
-                videoElement.removeEventListener('error', onAdError);
-            };
-
-            // 3. Set the video source to the Ad
+            // Setup Video Element
             videoElement.src = AD_URL;
             videoElement.loop = false;
-            videoElement.controls = false; // Disable controls during ad
+            videoElement.controls = false; // Disable native controls during ad
             
-            videoElement.addEventListener('ended', onAdEnded);
-            videoElement.addEventListener('error', onAdError);
+            videoElement.addEventListener('ended', finishAd);
+            videoElement.addEventListener('error', (e) => {
+                console.warn("Ad Error, skipping", e);
+                finishAd();
+            });
+            
+            // Attach Click Event to Skip Button
+            skipBtn.onclick = onSkipClicked;
 
-            // 4. Attempt to play
+            // Play
             videoElement.play().catch(e => {
-                console.log("Browser blocked autoplay:", e);
-                cleanUpAdListeners();
-                resolve(); // Skip ad if browser blocks it
+                console.log("Ad Autoplay Blocked:", e);
+                finishAd(); // Immediately skip if browser blocks autoplay
             });
         });
     };
 
+    // ==========================================
+    // 8. OPEN PLAYER WORKFLOW
+    // ==========================================
+
     const openPlayer = async (publicStreamInfo) => {
-        // --- 1. OPEN UI ---
+        // --- 1. SHOW UI ---
         if (playerView) {
             playerView.classList.add('active');
             document.body.classList.add('no-scroll');
@@ -199,16 +245,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.history.pushState({ path: newUrl }, '', newUrl);
         document.title = `${publicStreamInfo.name} - Litestream`;
 
-        // --- 2. PLAY AD (Wait for 2:13s or 'ended' event) ---
+        // --- 2. PLAY AD (Await completion) ---
         await playAd();
 
-        // --- 3. CHECK IF USER CLOSED PLAYER ---
+        // --- 3. CHECK IF STILL OPEN ---
+        // If user closed player during ad, stop here.
         if (!playerView.classList.contains('active')) return;
 
-        // --- 4. PREPARE FOR LIVE STREAM ---
+        // --- 4. LOAD CHANNEL ---
         updateStatusText("Loading Stream...", "var(--theme-color)"); 
 
-        // CRITICAL FIX: Reset video element to remove MP4 trace
+        // CRITICAL: Reset source to clear MP4 before loading DASH/HLS
         videoElement.removeAttribute('src'); 
         videoElement.load(); 
 
@@ -221,7 +268,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const secureData = await res.json();
 
-            // Initialize Shaka if not ready
             if (!player) {
                 const success = await initPlayer();
                 if (!success) return;
@@ -234,12 +280,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             player.configure(config);
 
-            // Re-enable Shaka UI now that Ad is gone
+            // Turn Shaka UI back on
             if (ui) ui.setEnabled(true);
 
             await player.load(secureData.manifestUri);
             
-            videoElement.play().catch(() => console.log("Auto-play blocked"));
+            videoElement.play().catch(() => console.log("Stream Auto-play blocked"));
             
             updateStatusText(groupTitle, "var(--theme-color)");
 
@@ -267,17 +313,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const closePlayer = async () => {
-        // --- SAFE EXIT LOGIC ---
-        // 1. Force stop the Ad
-        isAdPlaying = false;
+        // --- SAFE EXIT ---
+        
+        // 1. Ensure Skip button is gone
+        skipBtn.style.display = 'none';
+
+        // 2. Stop Video Element completely
         videoElement.pause();
         videoElement.removeAttribute('src'); 
-        videoElement.load(); // Clears buffer
+        videoElement.load(); 
 
-        // 2. Unload Shaka
+        // 3. Unload Shaka
         if (player) await player.unload();
         
-        // 3. Close UI
+        // 4. Close UI
         if(playerView) playerView.classList.remove('active');
         if(minimizedPlayer) minimizedPlayer.classList.remove('active');
         document.body.classList.remove('no-scroll');
@@ -287,7 +336,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // ==========================================
-    // CHANNEL LISTINGS & UI EVENTS
+    // 9. LISTINGS & EVENTS
     // ==========================================
 
     async function fetchChannels() {
@@ -367,7 +416,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // ==========================================
-    // INITIALIZATION
+    // 10. BOOT & LISTENERS
     // ==========================================
 
     renderMenu();
@@ -409,11 +458,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         header.classList.toggle("scrolled", window.scrollY > 10);
     });
 
-    // --- Boot Sequence ---
+    // Load Data
     allStreams = await fetchChannels();
     currentFilteredStreams = [...allStreams];
     renderChannels(true);
 
+    // Deep Link Check
     const urlParams = new URLSearchParams(window.location.search);
     const channelSlug = urlParams.get('channel');
     let hasPlayedLink = false;
