@@ -1,8 +1,14 @@
 (function() {
-    const AD_CONFIG = {
-        videoUrl: '/assets/ads/boots-trailer.mp4',
-        linkUrl: 'https://www.netflix.com/ph-en/title/81427990?preventIntent=true'
-    };
+    const AD_PLAYLIST = [
+        {
+            videoUrl: '/assets/ads/112620250001.mp4',
+            linkUrl: 'https://www.netflix.com/ph-en/title/81427990?preventIntent=true'
+        },
+        {
+            videoUrl: '/assets/ads/112720250002.mp4',
+            linkUrl: 'https://www.netflix.com/ph-en/title/81427990?preventIntent=true'
+        }
+    ];
 
     let adContainer = null;
     let timerDisplay = null;
@@ -101,6 +107,8 @@
     window.playVideoAd = async function(videoElement, playerWrapper, shakaPlayer, shakaUI, statusCallback) {
         createAdUI(playerWrapper);
 
+        const currentAd = AD_PLAYLIST[Math.floor(Math.random() * AD_PLAYLIST.length)];
+        
         if (shakaPlayer) await shakaPlayer.unload();
         if (shakaUI) shakaUI.setEnabled(false);
         if (statusCallback) statusCallback("Advertisement", "yellow");
@@ -123,7 +131,6 @@
                 videoElement.removeEventListener('ended', finishAd);
                 videoElement.removeEventListener('error', onError);
                 videoElement.removeEventListener('timeupdate', onTimeUpdate);
-                
                 videoElement.removeEventListener('contextmenu', preventContextMenu);
 
                 if (skipBtn) skipBtn.onclick = null;
@@ -136,32 +143,34 @@
             };
 
             const onError = (e) => {
-                console.warn("Ad failed", e);
+                console.warn("Ad failed to load or play:", e);
                 finishAd();
             };
 
             const onSkipClicked = (e) => {
                 if(e) e.stopPropagation();
-                console.log("Ad Skipped");
+                console.log("Ad Skipped by user");
                 finishAd();
             };
 
             const onVisitClicked = (e) => {
                 if(e) e.stopPropagation();
-                window.open(AD_CONFIG.linkUrl, '_blank');
+                if (currentAd.linkUrl) {
+                    window.open(currentAd.linkUrl, '_blank');
+                }
             };
 
             const onTimeUpdate = () => {
-                if(videoElement.duration) {
+                if(videoElement.duration && videoElement.currentTime > 0) {
                     const remaining = videoElement.duration - videoElement.currentTime;
                     timerDisplay.textContent = "Ad • " + formatTime(remaining);
                 }
             };
 
-            videoElement.src = AD_CONFIG.videoUrl;
+            videoElement.src = currentAd.videoUrl;
             videoElement.loop = false;
             videoElement.controls = false;
-            videoElement.muted = false; 
+            videoElement.muted = false;
 
             videoElement.addEventListener('ended', finishAd);
             videoElement.addEventListener('error', onError);
@@ -171,7 +180,7 @@
             visitBtn.onclick = onVisitClicked;
 
             videoElement.play().catch(e => {
-                console.log("Ad Autoplay Blocked:", e);
+                console.log("Ad Autoplay Blocked or Failed:", e);
                 finishAd();
             });
         });
