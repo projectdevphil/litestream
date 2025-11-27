@@ -11,6 +11,10 @@
         {
             videoUrl: '/assets/ads/112720250003.mp4',
             linkUrl: 'https://www.netflix.com/ph-en/title/81427990?preventIntent=true'
+        },
+        {
+            videoUrl: '/assets/ads/112820250004.mp4',
+            linkUrl: 'https://dito.ph/'
         }
     ];
 
