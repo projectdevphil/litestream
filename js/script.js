@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentlyDisplayedCount = 0;
     
     const defaultPageTitle = document.title; 
+
     const createSlug = (name) => {
         if (!name) return '';
         return name.toString().toLowerCase()
@@ -348,4 +349,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateStatusText("", "var(--text-color)");
         if(videoElement) videoElement.poster = POSTER_DESKTOP;
     }
+
+    const disableContextMenu = (el) => {
+        if (!el) return;
+        el.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            return false;
+        });
+        el.addEventListener('dragstart', (e) => {
+            e.preventDefault();
+            return false;
+        });
+        el.style.webkitTouchCallout = 'none';
+        el.style.userSelect = 'none';
+    };
+
+    const headerLogo = document.querySelector('.header-left .logo');
+    disableContextMenu(headerLogo);
+
+    const lastSlide = document.querySelector('.featured-slider .slider a.slide');
+    disableContextMenu(lastSlide);
+
 });
