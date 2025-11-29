@@ -9,7 +9,7 @@
     { "source": "/home/faq", "destination": "/faq.html" },
     { "source": "/home/privacy", "destination": "/privacy.html" },
     { "source": "/home/terms", "destination": "/terms.html" },
-    { "source": "/home", "destination": "/index.html" },
+    { "source": "/home", "destination": "/home/index.html" },
     { "source": "/", "destination": "/index.html" }
   ],
   "headers": [
