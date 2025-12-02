@@ -15,13 +15,13 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/static.css">
     <style>
-        /* Specific styles for the Updates page */
         .update-date {
             font-size: 0.85rem;
             color: #aaa;
             margin-bottom: 10px;
             display: block;
         }
+        
         .channel-logos {
             display: flex;
             flex-wrap: wrap;
@@ -30,24 +30,41 @@
             margin-bottom: 25px;
             align-items: center;
         }
-        .channel-logo-placeholder {
+        .channel-logo-link {
             background: #2a2a2a;
             color: #fff;
-            padding: 8px 12px;
+            padding: 10px 14px;
             border-radius: 6px;
             font-weight: 600;
             font-size: 0.85rem;
             text-align: center;
             border: 1px solid #333;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        .channel-logo-link:hover {
+            background: #444;
+            border-color: #555;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .channel-logo-link:active {
+            transform: translateY(0);
+        }
+        .play-icon {
+            font-size: 1rem;
+            margin-right: 5px;
+            color: #ddd;
         }
         
-        /* News Button Styles */
         .news-links-container {
             margin-top: 20px;
             margin-bottom: 15px;
         }
         .news-links-title {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: bold;
             margin-bottom: 10px;
             display: block;
@@ -58,9 +75,9 @@
             background-color: #333;
             color: #e0e0e0;
             text-decoration: none;
-            padding: 10px 16px;
-            border-radius: 50px; /* Pill shape */
-            font-size: 0.85rem;
+            padding: 8px 8px;
+            border-radius: 50px;
+            font-size: 0.8rem;
             margin-right: 10px;
             margin-bottom: 10px;
             transition: background-color 0.2s, transform 0.1s;
@@ -74,18 +91,9 @@
             transform: scale(0.98);
         }
         .news-icon {
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             margin-right: 6px;
             vertical-align: middle;
-        }
-
-        .source-citation {
-            font-size: 0.75rem;
-            color: #666;
-            font-style: italic;
-            margin-top: 20px;
-            border-top: 1px solid #222;
-            padding-top: 10px;
         }
         .advisory-tag {
             background-color: #d32f2f;
@@ -95,7 +103,7 @@
             font-size: 0.75rem;
             font-weight: bold;
             vertical-align: middle;
-            margin-left: 10px;
+            margin-left: 6px;
         }
     </style>
 </head>
@@ -110,7 +118,6 @@
 
         <main class="content-card">
             
-            <!-- Update Entry 1 -->
             <section>
                 <h2>Channel Advisory <span class="advisory-tag">IMPORTANT</span></h2>
                 <span class="update-date">Posted: December 2, 2025</span>
@@ -126,12 +133,17 @@
                 
                 <p>You can continue to watch other great music programming on these channels:</p>
                 <div class="channel-logos">
-                    <span class="channel-logo-placeholder">MYX</span>
-                    <span class="channel-logo-placeholder">VEVO POP</span>
-                    <span class="channel-logo-placeholder">MTV LIVE (US VERSION)</span>
+                    <a href="/home?channel=myx" class="channel-logo-link">
+                        <span class="material-symbols-rounded play-icon">sensors</span> MYX
+                    </a>
+                    <a href="/home?channel=vevo-pop" class="channel-logo-link">
+                        <span class="material-symbols-rounded play-icon">sensors</span> VEVO POP
+                    </a>
+                    <a href="/home?channel=mtv-live-(us)" class="channel-logo-link">
+                        <span class="material-symbols-rounded play-icon">sensors</span> MTV LIVE (US)
+                    </a>
                 </div>
 
-                <!-- External News Links -->
                 <div class="news-links-container">
                     <span class="news-links-title">Read more from official sources:</span>
                     
@@ -140,19 +152,13 @@
                     </a>
                     
                     <a href="https://entertainment.inquirer.net/633513/mtv-to-shut-down-some-of-its-music-channels-after-40-years/amp" target="_blank" rel="noopener noreferrer" class="news-btn">
-                        <span class="material-symbols-rounded news-icon">newspaper</span> Inquirer.net
+                        <span class="material-symbols-rounded news-icon">public</span> Inquirer.net
                     </a>
-                </div>
-
-                <!-- Internal Source Citation -->
-                <div class="source-citation">
-                    News/Information Source: Paramount Global Advisory / Litestream Channel Management
                 </div>
             </section>
 
             <hr>
 
-            <!-- Placeholder for future updates -->
             <section>
                 <h2>Service Status</h2>
                 <p>All other systems and channels are currently operational. For the most current service updates and information outside of this page, please visit our status page.</p>
