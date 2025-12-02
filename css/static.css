@@ -109,6 +109,10 @@ hr {
     margin: 25px 0;
 }
 
+.text-center {
+    text-align: left;
+}
+
 .update-date {
     font-size: 0.85rem;
     color: #aaa;
@@ -117,8 +121,8 @@ hr {
 }
 
 .advisory-tag {
-    background-color: #d32f2f;
-    color: white;
+    background-color: var(--theme-color);
+    color: var(--card-background);
     padding: 2px 8px;
     border-radius: 4px;
     font-size: 0.75rem;
@@ -146,7 +150,7 @@ hr {
     text-align: center;
     border: 1px solid #333;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s, transform 0.1s;
     display: inline-flex;
     align-items: center;
 }
@@ -154,12 +158,10 @@ hr {
 .channel-logo-link:hover {
     background: #444;
     border-color: #555;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .channel-logo-link:active {
-    transform: translateY(0);
+    transform: scale(0.98);
 }
 
 .play-icon {
@@ -208,6 +210,56 @@ hr {
     font-size: 0.95rem;
     margin-right: 6px;
     vertical-align: middle;
+}
+
+.social-icon-links {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 25px;
+}
+
+.social-icon-links a {
+    align-items: center;
+    background-color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    height: 45px;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    width: 45px;
+}
+
+.social-icon-links a:active {
+    transform: scale(0.95);
+}
+
+.social-icon-links img {
+    height: 24px;
+    width: 24px;
+    filter: grayscale(100%);
+    pointer-events: none;
+}
+
+.developer-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; 
+    text-align: left;
+    margin-top: 20px;
+}
+
+.developer-logo {
+    height: auto;
+    max-width: 180px;
+    opacity: 0.7;
+    pointer-events: none;
+    margin-left: 0; 
+    transition: opacity 0.2s ease;
+}
+
+.developer-logo:hover {
+  opacity: 1;
 }
 
 .combined-status-box {
@@ -291,7 +343,7 @@ hr {
 }
 
 .tip-highlight {
-    color: #4fc3f7;
+    color: var(--text-color);
     font-weight: 600;
 }
 
@@ -305,6 +357,8 @@ a, img, button,
 .channel-logo-link, 
 .news-btn, 
 .back-button, 
+.social-icon-links a,
+.developer-logo,
 .combined-status-box {
     -webkit-touch-callout: none !important;
     -webkit-user-select: none !important;
