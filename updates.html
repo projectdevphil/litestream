@@ -65,25 +65,26 @@
 
             <section>
                 <h2>Service Status</h2>
-                <p>All other systems and channels are currently operational. For the most current service updates and information, please check below.</p>
+                <p>All other systems and channels are currently operational.</p>
 
-                <div class="quality-tip">
-                    <span class="material-symbols-rounded tip-icon">wifi_tethering</span>
-                    <div>
-                        <strong>Stream Quality Tip:</strong><br>
-                        If your connection is <b>slow</b>, switch to <span class="tip-highlight">360p</span> or <span class="tip-highlight">480p</span>.<br>
-                        If your connection is <b>fast</b>, switch to <span class="tip-highlight">720p</span> or <span class="tip-highlight">1080p</span>.
+                <div class="combined-status-box">
+                    <div class="status-header">
+                        <span class="status-dot" id="statusDot"></span>
+                        <span id="statusText">Checking Connection...</span>
+                    </div>
+
+                    <hr class="status-divider">
+
+                    <div class="stream-tips-small">
+                        <span class="material-symbols-rounded tip-icon-small">wifi_tethering</span>
+                        <div>
+                            <strong>Stream Quality Tip:</strong>
+                            Slow internet? Switch to <span class="tip-highlight">360p</span> or <span class="tip-highlight">480p</span>.<br>
+                            Fast internet? Switch to <span class="tip-highlight">720p</span> or <span class="tip-highlight">1080p</span>.
+                        </div>
                     </div>
                 </div>
             </section>
-
-            <footer class="site-footer">
-                <div class="status-pill" id="statusPill">
-                    <span class="status-dot" id="statusDot"></span>
-                    <span id="statusText">Checking Connection...</span>
-                </div>
-                <span class="footer-copyright">&copy; 2025 Litestream IPTV</span>
-            </footer>
 
         </main>
     </div>
@@ -91,7 +92,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            const protectAll = document.querySelectorAll('a, button, img, .channel-logo-link, .news-btn, .status-pill, .quality-tip');
+            const protectAll = document.querySelectorAll('a, button, img, .channel-logo-link, .news-btn, .combined-status-box');
             protectAll.forEach(el => {
                 el.addEventListener('contextmenu', (e) => { 
                     e.preventDefault(); 
@@ -132,4 +133,3 @@
         });
     </script>
 </body>
-</html>
