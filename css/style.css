@@ -4,7 +4,7 @@
     --background-color: #000000;
     --border-radius: 15px;
     --card-background: #1a1a1a;
-    --glass-bg: rgba(25, 25, 25, 0.85);
+    --glass-bg: rgba(25, 25, 25, 0.5);
     --glass-border: 1px solid rgba(255, 255, 255, 0.1);
     --text-color: #ffffff;
     --text-secondary: #b3b3b3;
@@ -77,10 +77,14 @@ header.scrolled {
 }
 
 .logo {
-    color: var(--text-color);
-    font-size: 1.38rem;
-    font-weight: 900;
-    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    height: 28px;
+    width: auto;
+    display: block;
 }
 
 header nav {
