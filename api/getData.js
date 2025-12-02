@@ -72,7 +72,8 @@ export default function handler(req, res) {
         { name: 'HBO Signature', logo: 'https://static.wikia.nocookie.net/logopedia/images/3/3b/HBO_Signature_%28Asia%29_logo.svg', manifestUri: 'https://qp-pldt-live-bpk-02-prod.akamaized.net/bpk-tv/cg_hbosign/default/index.mpd', clearKey: { 'a06ca6c275744151895762e0346380f5': '559da1b63eec77b5a942018f14d3f56f' }, group: 'Movies' },
         //{ name: 'HITS Movies', logo: 'https://static.wikia.nocookie.net/russel/images/b/b9/Hits_Movies_Logo_2018.png', manifestUri: 'https://qp-pldt-live-bpk-01-prod.akamaized.net/bpk-tv/dr_hitsmovies/default/index.mpd', clearKey: { 'f56b57b32d7e4b2cb21748c0b56761a7': '3df06a89aa01b32655a77d93e09e266f' }, group: 'Movies' },
         { name: 'HITS Movies', logo: 'https://static.wikia.nocookie.net/russel/images/b/b9/Hits_Movies_Logo_2018.png', manifestUri: 'https://linearjitp-playback.astro.com.my/dash-wv/linear/2305/default_ott.mpd', clearKey: { 'ff1febd7018d0dd711601e795e0d6210': '38fbfb3a56e40ff92c9df8acbcba9ef6' }, group: 'Movies' },
-        
+        { name: 'Studio Universal', logo: '/assets/studio_universal_logo.svg', manifestUri: 'https://cdn10jtedge.indihometv.com/atm/DASH/studiouniversal/manifest.mpd', group: 'Movies' },        
+
         // Sports
         { name: 'One Sports', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/One_Sports_logo.svg/1200px-One_Sports_logo.svg.png', manifestUri: 'https://qp-pldt-live-bpk-02-prod.akamaized.net/bpk-tv/cg_onesports_hd/default/index.mpd', clearKey: { '53c3bf2eba574f639aa21f2d4409ff11': '3de28411cf08a64ea935b9578f6d0edd' }, group: 'Sports' },
         { name: 'One Sports+', logo: 'https://static.wikia.nocookie.net/tvfanon6528/images/5/58/One_Sports%2B_%282020-.n.v.%29.png', manifestUri: 'https://qp-pldt-live-bpk-02-prod.akamaized.net/bpk-tv/cg_onesportsplus_hd1/default/index.mpd', clearKey: { '322d06e9326f4753a7ec0908030c13d8': '1e3e0ca32d421fbfec86feced0efefda' }, group: 'Sports' },
