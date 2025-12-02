@@ -15,6 +15,10 @@
         {
             videoUrl: '/assets/ads/112820250004.mp4',
             linkUrl: 'https://dito.ph/'
+        },
+        {
+            videoUrl: '/assets/ads/120220250005.mp4',
+            linkUrl: '/updates'
         }
     ];
 
