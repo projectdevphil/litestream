@@ -18,7 +18,7 @@
         },
         {
             videoUrl: '/assets/ads/120220250005.mp4',
-            linkUrl: '/updates'
+            linkUrl: '/home/updates'
         }
     ];
 
