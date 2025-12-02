@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Updates - Litestream</title>
+    <meta name="theme-color" content="#000000">
+    <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="shortcut icon" href="/assets/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Litestream" />
+    <link rel="manifest" href="/assets/site.webmanifest" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/static.css">
+    <style>
+        /* Specific styles for the Updates page */
+        .update-date {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .channel-logos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            align-items: center;
+        }
+        .channel-logo-placeholder {
+            background: #2a2a2a;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        
+        /* News Button Styles */
+        .news-links-container {
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        .news-links-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .news-btn {
+            display: inline-flex;
+            align-items: center;
+            background-color: #333;
+            color: #e0e0e0;
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 50px; /* Pill shape */
+            font-size: 0.85rem;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: background-color 0.2s, transform 0.1s;
+            border: 1px solid #444;
+        }
+        .news-btn:hover {
+            background-color: #444;
+            color: #fff;
+        }
+        .news-btn:active {
+            transform: scale(0.98);
+        }
+        .news-icon {
+            font-size: 1.1rem;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        .source-citation {
+            font-size: 0.75rem;
+            color: #666;
+            font-style: italic;
+            margin-top: 20px;
+            border-top: 1px solid #222;
+            padding-top: 10px;
+        }
+        .advisory-tag {
+            background-color: #d32f2f;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="static-page-container">
+        <header class="static-header">
+            <a href="/home" class="back-button" aria-label="Back to Litestream">
+                <span class="material-symbols-rounded">arrow_back</span>
+            </a>
+            <h1>Updates</h1>
+        </header>
+
+        <main class="content-card">
+            
+            <!-- Update Entry 1 -->
+            <section>
+                <h2>Channel Advisory <span class="advisory-tag">IMPORTANT</span></h2>
+                <span class="update-date">Posted: December 2, 2025</span>
+                
+                <h3>MTV Live Cessation of Broadcast</h3>
+                <p><strong>MTV Live</strong> channel will permanently cease all broadcast transmission worldwide (excluding the U.S. feed) effective <strong>January 1, 2026</strong>.</p>
+                
+                <p>The final day of programming for MTV Live will be <strong>Tuesday, December 31, 2025</strong>. Following the closure, the channel will be removed from the channel list starting on January 1, 2026.</p>
+                
+                <p>This decision by Paramount Global reflects a global strategy shift in response to the changing landscape of music consumption.</p>
+                
+                <hr style="border-color: #222; margin: 20px 0;">
+                
+                <p>You can continue to watch other great music programming on these channels:</p>
+                <div class="channel-logos">
+                    <span class="channel-logo-placeholder">MYX</span>
+                    <span class="channel-logo-placeholder">VEVO POP</span>
+                    <span class="channel-logo-placeholder">MTV LIVE (US VERSION)</span>
+                </div>
+
+                <!-- External News Links -->
+                <div class="news-links-container">
+                    <span class="news-links-title">Read more from official sources:</span>
+                    
+                    <a href="https://www.bbc.com/news/articles/cdr612yz8p0o" target="_blank" rel="noopener noreferrer" class="news-btn">
+                        <span class="material-symbols-rounded news-icon">public</span> BBC News
+                    </a>
+                    
+                    <a href="https://entertainment.inquirer.net/633513/mtv-to-shut-down-some-of-its-music-channels-after-40-years/amp" target="_blank" rel="noopener noreferrer" class="news-btn">
+                        <span class="material-symbols-rounded news-icon">newspaper</span> Inquirer.net
+                    </a>
+                </div>
+
+                <!-- Internal Source Citation -->
+                <div class="source-citation">
+                    News/Information Source: Paramount Global Advisory / Litestream Channel Management
+                </div>
+            </section>
+
+            <hr>
+
+            <!-- Placeholder for future updates -->
+            <section>
+                <h2>Service Status</h2>
+                <p>All other systems and channels are currently operational. For the most current service updates and information outside of this page, please visit our status page.</p>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const protectedElements = document.querySelectorAll('.back-button, img');
+            protectedElements.forEach(el => {
+                el.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; });
+            });
+
+            const header = document.querySelector(".static-header");
+            window.addEventListener("scroll", () => {
+                header.classList.toggle("scrolled", window.scrollY > 10);
+            });
+        });
+    </script>
+</body>
+</html>
