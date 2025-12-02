@@ -60,13 +60,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!floatingMenu) return;
         floatingMenu.innerHTML = `
         <ul>
+            <li><a href="/home/updates"><span class="material-symbols-rounded">notifications_active</span> Updates</a></li>
+            <li><a href="https://projectdevphil.github.io/stream-tester"><span class="material-symbols-rounded">experiment</span> Stream Tester</a></li>            
+            <li><a href="https://projectdevphil.github.io/speedup"><span class="material-symbols-rounded">speed</span> SpeedUp</a></li>            
             <li><a href="/home/about"><span class="material-symbols-rounded">info</span> About Us</a></li>
             <li><a href="/home/faq"><span class="material-symbols-rounded">quiz</span> FAQ</a></li>
             <li><a href="/home/privacy"><span class="material-symbols-rounded">shield</span> Privacy Policy</a></li>
             <li><a href="/home/terms"><span class="material-symbols-rounded">gavel</span> Terms of Service</a></li>
-            <li><a href="/home/updates"><span class="material-symbols-rounded">notifications_active</span> Updates</a></li>
-            <li><a href="https://projectdevphil.github.io/stream-tester"><span class="material-symbols-rounded">experiment</span> Stream Tester</a></li>            
-            <li><a href="https://projectdevphil.github.io/speedup"><span class="material-symbols-rounded">speed</span> SpeedUp</a></li>            
         </ul>`;
 
         const menuLinks = floatingMenu.querySelectorAll('a');
