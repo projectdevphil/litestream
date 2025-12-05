@@ -28,15 +28,14 @@
     #player-view {
         display: flex;
         flex-direction: column;
-        position: -webkit-sticky;
         position: sticky;
-        top: 80px;
-        height: calc(100vh - 100px); 
+        transform: none;
         background: var(--background-color);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
         padding: 0;
-        z-index: 5;
-        visibility: visible;
-        border-radius: var(--border-radius);
+        height: calc(100vh - 100px);
+        z-index: 1;
     }
     
     .player-header {
@@ -80,7 +79,7 @@
         font-size: 0.9rem;
         font-weight: 600;
         gap: 3.5px;
-        margin-right: 23px;
+        margin-right: 20px;
     }
     
     .content-container {
