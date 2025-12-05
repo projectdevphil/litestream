@@ -258,37 +258,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    const setupSlider = () => {
-        const slider = document.querySelector(".slider");
-        if (!slider) return;
-        const slides = slider.querySelectorAll(".slide");
-        const dots = slider.parentElement.querySelectorAll(".slider-nav .dot");
-        
-        if(slides.length === 0) return;
-        let currentSlide = 0;
-        let slideInterval = setInterval(nextSlide, 5000);
-
-        function goToSlide(n) { 
-            slides.forEach((s, i) => s.classList.toggle("active", i === n)); 
-            dots.forEach((d, i) => d.classList.toggle("active", i === n)); 
-        }
-        function nextSlide() { 
-            currentSlide = (currentSlide + 1) % slides.length; 
-            goToSlide(currentSlide); 
-        }
-        dots.forEach((dot, index) => {
-            dot.addEventListener("click", () => {
-                currentSlide = index;
-                goToSlide(index);
-                clearInterval(slideInterval);
-                slideInterval = setInterval(nextSlide, 5000);
-            });
-        });
-    };
-
     renderMenu();
-    setupSlider();
-
+    
     menuBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         floatingMenu.classList.toggle("active");
@@ -368,8 +339,5 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const headerLogo = document.querySelector('.header-left .logo');
     disableContextMenu(headerLogo);
-
-    const lastSlide = document.querySelector('.featured-slider .slider a.slide');
-    disableContextMenu(lastSlide);
 
 });
