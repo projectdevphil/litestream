@@ -124,7 +124,7 @@
         top: -40px;
         bottom: -40px;
         left: -40px;
-        right: -40px;
+        right: -30px;
         filter: blur(50px) saturate(1.5) brightness(0.8);
     }
 
