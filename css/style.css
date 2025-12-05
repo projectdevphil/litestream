@@ -11,6 +11,33 @@
     --theme-color: #ffffff;
 }
 
+/* --- SCROLL MOTION STYLES (NEW) --- */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+}
+
+.reveal-on-scroll.active-reveal {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Stagger children in lists */
+.channel-list-item {
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.5s ease;
+}
+
+.channel-list-item.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* --- EXISTING STYLES --- */
+
 body {
     -ms-overflow-style: none;
     -webkit-tap-highlight-color: transparent;
@@ -190,104 +217,7 @@ header nav {
     width: 100%;
 }
 
-.featured-slider {
-    margin: 20px;
-    position: relative;
-}
-
-.slider {
-    aspect-ratio: 16 / 9;
-    background-color: #000;
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    position: relative;
-}
-
-.slide {
-    display: block;
-    height: 100%;
-    opacity: 0;
-    position: absolute;
-    transform: translateX(-30px);
-    transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.8s;
-    width: 100%;
-}
-
-.slide.active {
-    opacity: 1;
-    transform: translateY(0);
-    z-index: 1;
-}
-
-.slide-bg {
-    border-radius: var(--border-radius);
-    height: 100%;
-    object-fit: cover;
-    pointer-events: none;
-    position: absolute;
-    width: 100%;
-    background: #111;
-}
-
-.slide-overlay {
-    background: radial-gradient(circle at top right, transparent 35%, black 100%);
-    inset: 0;
-    position: absolute;
-}
-
-.slide-content {
-    bottom: 20px;
-    color: white;
-    left: 20px;
-    position: absolute;
-    z-index: 2;
-}
-
-.slide-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin: 0 50px 2px 0;
-}
-
-.slide-description {
-    color: var(--text-secondary);
-    font-size: 0.6rem;
-    line-height: 1.5;
-    margin: 0 0 6px 0;
-}
-
-.slide-badge {
-    background-color: var(--theme-color);
-    border-radius: 4px;
-    color: #000;
-    display: inline-block;
-    font-size: 0.5rem;
-    font-weight: 700;
-    padding: 3px 3px;
-}
-
-.slider-nav {
-    bottom: 20px;
-    display: flex;
-    gap: 5px;
-    position: absolute;
-    right: 20px;
-    z-index: 3;
-}
-
-.slider-nav .dot {
-    background-color: rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
-    height: 7px;
-    width: 7px;
-    transition: all 0.3s;
-}
-
-.slider-nav .dot.active {
-    background-color: var(--theme-color);
-    width: 20px;
-    border-radius: 20px;
-}
+/* Removed old Featured Slider CSS, now handled by React/Tailwind */
 
 .section-header {
     font-size: 1rem;
@@ -317,7 +247,6 @@ header nav {
     display: flex;
     justify-content: space-between;
     padding: 12px 15px;
-    transition: background-color 0.2s ease;
 }
 
 .channel-list-item:last-child {
