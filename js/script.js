@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const API_GET_DATA = '/api/getData';
     const API_GET_SLIDES = '/api/getSlides';
     const API_GET_ADS = '/api/getAds';
-    const CHANNELS_PER_PAGE = 40;
+    const CHANNELS_PER_PAGE = 50;
     const BASE_URL_PATH = '/home';
     const POSTER_MOBILE = '/assets/poster/mobile.png';
     const POSTER_DESKTOP = '/assets/poster/desktop.png';
@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentlyDisplayedCount = 0;
     let currentActiveChannelSlug = null; 
     const defaultPageTitle = document.title; 
+    const offlineChannels = new Set(); 
 
     let adContainer = null;
     let adTimerDisplay = null;
@@ -64,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if(Array.isArray(data) && data.length > 0) return data;
             return null;
         } catch (error) {
-            console.error("Ad Fetch Error:", error);
+            console.error(error);
             return null;
         }
     }
@@ -125,7 +126,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const adPlaylist = await fetchAds();
         if (!adPlaylist) {
-            console.log("No ads to play.");
             return;
         }
 
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 resolve();
             };
 
-            const onError = (e) => { console.warn("Ad error:", e); finishAd(); };
+            const onError = (e) => { finishAd(); };
             const onSkipClicked = (e) => { if(e) e.stopPropagation(); finishAd(); };
             const onVisitClicked = (e) => {
                 if(e) e.stopPropagation();
@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             adSkipBtn.onclick = onSkipClicked;
             adVisitBtn.onclick = onVisitClicked;
 
-            vidElem.play().catch(e => { console.log("Ad Autoplay Blocked:", e); finishAd(); });
+            vidElem.play().catch(e => { finishAd(); });
         });
     }
 
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!response.ok) throw new Error('Failed to load slides');
             return await response.json();
         } catch (error) {
-            console.error("Slider Data Error:", error);
+            console.error(error);
             return [];
         }
     };
@@ -361,12 +361,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ui = new shaka.ui.Overlay(player, playerWrapper, videoElement);
                 ui.configure({ addSeekBar: false });
             } catch (e) {
-                console.warn("UI init failed", e);
+                console.warn(e);
                 videoElement.controls = true;
             }
 
             player.addEventListener('error', (event) => {
-                console.error('Error code', event.detail.code);
+                console.error(event.detail.code);
+                
+                if(currentActiveChannelSlug) {
+                    offlineChannels.add(currentActiveChannelSlug);
+                }
+                
                 updateOfflineState(true); 
                 if(playerSkeleton) playerSkeleton.style.display = 'none'; 
             });
@@ -378,7 +383,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const openPlayer = async (publicStreamInfo) => {
-        if(currentActiveChannelSlug) {
+        if(currentActiveChannelSlug && !offlineChannels.has(currentActiveChannelSlug)) {
             const prevIcon = document.getElementById(`sensor-${currentActiveChannelSlug}`);
             if(prevIcon) {
                 prevIcon.textContent = 'sensors';
@@ -396,7 +401,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if(playerSkeleton && window.innerWidth > 1024) playerSkeleton.style.display = 'block';
 
-        updateOfflineState(false);
+        updateOfflineState(offlineChannels.has(currentActiveChannelSlug));
+        
         if(mainPlayerStatus) {
             mainPlayerStatus.textContent = "Loading Stream...";
             mainPlayerStatus.style.color = "var(--theme-color)";
@@ -448,11 +454,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             videoElement.play().catch(() => console.log("Stream Auto-play blocked"));
             
             if(playerSkeleton) playerSkeleton.style.display = 'none';
+            
+            offlineChannels.delete(currentActiveChannelSlug);
             updateOfflineState(false); 
             if(mainPlayerStatus) mainPlayerStatus.textContent = groupTitle;
 
         } catch (e) {
-            console.error('Load failed', e);
+            console.error(e);
+            offlineChannels.add(currentActiveChannelSlug);
             updateOfflineState(true);
             if(playerSkeleton) playerSkeleton.style.display = 'none';
         }
@@ -484,7 +493,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if(currentActiveChannelSlug) {
             const listIcon = document.getElementById(`sensor-${currentActiveChannelSlug}`);
-            if(listIcon) {
+            if(listIcon && !offlineChannels.has(currentActiveChannelSlug)) {
                 listIcon.textContent = 'sensors';
                 listIcon.classList.remove('status-offline');
             }
@@ -519,13 +528,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             const logo = stream.logo || '/assets/favicon.svg';
             const slug = createSlug(stream.name);
             
+            if (stream.status === 'offline' || stream.active === false) {
+                offlineChannels.add(slug);
+            }
+
+            const isOffline = offlineChannels.has(slug);
+            const iconName = isOffline ? 'sensors_off' : 'sensors';
+            const colorClass = isOffline ? 'status-offline' : '';
+
             item.innerHTML = `
                 <div class="channel-info-left">
                     <img src="${logo}" class="channel-logo" onerror="this.style.opacity=0">
                     <span class="channel-name">${stream.name}</span>
                 </div>
                 <div class="channel-info-right">
-                    <span id="sensor-${slug}" class="material-symbols-rounded">sensors</span>
+                    <span id="sensor-${slug}" class="material-symbols-rounded ${colorClass}">${iconName}</span>
                 </div>`;
             
             item.addEventListener('click', () => openPlayer(stream));
@@ -597,7 +614,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (channelSlug) {
         const foundChannel = allStreams.find(s => createSlug(s.name) === channelSlug);
         if (foundChannel) {
-            console.log("Deep link detected for:", foundChannel.name);
             openPlayer(foundChannel);
             hasPlayedLink = true;
         }
