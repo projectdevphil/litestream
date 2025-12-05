@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const API_GET_CHANNELS = '/api/getChannels';
     const API_GET_DATA = '/api/getData';
-    const CHANNELS_PER_PAGE = 50;
+    const CHANNELS_PER_PAGE = 40;
     const BASE_URL_PATH = '/home';
     const POSTER_MOBILE = '/assets/poster/mobile.png';
     const POSTER_DESKTOP = '/assets/poster/desktop.png';
