@@ -1,5 +1,3 @@
---- START OF FILE js/script.js ---
-
 document.addEventListener('DOMContentLoaded', async () => {
     
     const API_GET_CHANNELS = '/api/getChannels';
