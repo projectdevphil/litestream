@@ -374,7 +374,7 @@ header nav {
 }
 
 .skeleton-list-container {
-    padding-top: 20px;
+    margin-top: 15px;
     background-color: var(--card-background);
     border-radius: var(--border-radius);
     width: 100%;
