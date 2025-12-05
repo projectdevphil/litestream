@@ -11,36 +11,15 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
     <link rel="manifest" href="/assets/site.webmanifest" />
     
-    <!-- Dependencies -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
-    
-    <!-- Fonts & Icons -->
+    <!-- Icons & Shaka Player -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    
-    <!-- Shaka Player -->
     <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/shaka-player.ui.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/controls.min.css" rel="stylesheet">
     
-    <!-- CSS -->
     <link rel="stylesheet" href="/css/style.css">    
     <link rel="stylesheet" href="/css/desktop.css">
-
-    <!-- Tailwind Config -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['"BR Sonoma"', 'sans-serif'] }
-                }
-            }
-        }
-    </script>
 </head>
-<body class="bg-black text-white">
+<body>
     <header>
         <div class="header-left">
             <a href="/home" class="logo">
@@ -86,8 +65,81 @@
 
             <div class="content-container">
                 
-                <!-- This DIV is where js/slider.js will inject the React Slider -->
-                <div id="react-slider-root" class="reveal-on-scroll"></div>
+                <!-- FEATURED SLIDER SECTION -->
+                <section id="featured-slider" class="featured-slider reveal-on-scroll">
+                    <!-- The Glow Shadow Background -->
+                    <div class="slider-glow-shadow" id="slider-glow"></div>
+
+                    <div class="slider" id="main-slider">
+                         <!-- Slide 1 -->
+                         <div class="slide active" data-color="#7f1d1d">
+                            <img src="https://pql-static.abs-cbn.com/images/batangquiapo.herobg-tv.v3.jpg?im_policy=landscapeHero_tv_hd" alt="FPJ's Batang Quiapo" class="slide-bg">
+                            <div class="slide-overlay"></div>
+                            <div class="slide-content">
+                                <div class="slide-badge visit-badge">Catch-Up TV • Action</div>
+                                <h2 class="slide-title">FPJ's Batang Quiapo</h2>
+                                <div class="slide-divider"></div>
+                                <p class="slide-description"><strong>MON-FRI | 8PM</strong><br>Kapamilya Channel, A2Z and TV5</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Slide 2 -->
+                        <div class="slide" data-color="#c2410c">
+                            <img src="https://occ-0-1763-395.1.nflxso.net/dnm/api/v6/6AYY37jfdO6hpXcMjf9Yu5cnmO0/AAAABQ2QL_Xl927R68dyQNd7mIavq3jzl6TXs2baGhbYVxfZNeMUOlnLsPelcmT2_iKWf0qLeFKMXQd4Dsx57QeHuuO2TS4iIKn3EFKO.webp" alt="ROJA" class="slide-bg">
+                            <div class="slide-overlay"></div>
+                            <div class="slide-content">
+                                <div class="slide-badge visit-badge">Catch-Up TV • Action</div>
+                                <h2 class="slide-title">ROJA</h2>
+                                <div class="slide-divider"></div>
+                                <p class="slide-description"><strong>MON-FRI | 8:45PM</strong><br>Kapamilya Channel, A2Z and TV5</p>
+                            </div> 
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="slide" data-color="#1e40af">
+                            <img src="https://pql-static.abs-cbn.com/images/pbbcelebritycollab.herobg-tv.V4.JPG?im_policy=landscapeHero_tv_hd" alt="PBB Celebrity Collab Edition 2.0" class="slide-bg">
+                            <div class="slide-overlay"></div>
+                            <div class="slide-content">
+                                <div class="slide-badge visit-badge">Catch-Up TV • Reality</div>
+                                <h2 class="slide-title">PBB Celebrity Collab<br>Edition 2.0</h2>
+                                <div class="slide-divider"></div>
+                                <p class="slide-description"><strong>MON-FRI | 9:40PM</strong><br>GMA7 and PBB Catch-Up Episode</p>
+                            </div> 
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="slide" data-color="#86198f">
+                            <img src="https://pql-static.abs-cbn.com/images/itsshowtime.herobg-tv.jpg?im_policy=landscapeHero_tv_fhd" alt="It's Showtime" class="slide-bg">
+                            <div class="slide-overlay"></div>
+                            <div class="slide-content">
+                                <div class="slide-badge visit-badge">Catch-Up TV • Variety</div>
+                                <h2 class="slide-title">It's Showtime</h2>
+                                <div class="slide-divider"></div>
+                                <p class="slide-description"><strong>MON-SAT | 12NN</strong><br>Kapamilya Channel, A2Z and GMA7</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 5 -->
+                        <a href="/home?channel=nba-tv-philippines" class="slide" data-color="#1d4ed8">
+                            <img src="https://occ-0-1763-395.1.nflxso.net/dnm/api/v6/6AYY37jfdO6hpXcMjf9Yu5cnmO0/AAAABcFuldBLfH2n_0Wiqx4rnmEyjCmJQdy7hbdu7D3ymqfYkqrDcBbgJt9iNU5EbhBzPmU97xqDUYDip3ZSb1y2AFfJdalF4fmaqnP4.webp" alt="NBA TV Philippines" class="slide-bg">
+                            <div class="slide-overlay"></div>
+                            <div class="slide-content">
+                                <div class="slide-badge visit-badge">Live</div>
+                                <h2 class="slide-title">NBA TV Philippines</h2>
+                                <div class="slide-divider"></div>
+                                <p class="slide-description"><strong>Sports</strong><br>Watch Now</p>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="slider-nav">
+                        <button class="dot active" data-index="0"></button>
+                        <button class="dot" data-index="1"></button>
+                        <button class="dot" data-index="2"></button>
+                        <button class="dot" data-index="3"></button>                       
+                        <button class="dot" data-index="4"></button>                       
+                    </div>
+                </section>
         
                 <h2 id="channel-list-header" class="section-header reveal-on-scroll">All Channels</h2>
         
@@ -95,7 +147,6 @@
                     <div class="spinner-container" id="spinner">
                         <div class="spinner"></div>
                     </div>
-                    <!-- The list items here will be animated by js/animations.js -->
                     <div class="channel-list" id="channel-list-container"></div>
                 </section>
         
@@ -114,7 +165,6 @@
     </main>
     
     <div id="minimized-player" class="minimized-player">
-        <!-- Player controls content -->
         <div class="minimized-player-left">
             <img id="minimized-player-logo" src="" alt="Channel Logo" class="minimized-logo">
             <div class="minimized-info">
@@ -128,14 +178,7 @@
         </div>
     </div>
 
-    <!-- Core App Scripts -->
     <script src="/js/ads.js"></script>
     <script src="/js/script.js"></script>
-
-    <!-- NEW: Scroll Animations -->
-    <script src="/js/animations.js"></script>
-
-    <!-- NEW: React Slider Logic (Must be type="text/babel") -->
-    <script type="text/babel" src="/js/slider.js"></script>
 </body>
 </html>
