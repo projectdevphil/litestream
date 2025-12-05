@@ -1,3 +1,5 @@
+--- START OF FILE js/script.js ---
+
 document.addEventListener('DOMContentLoaded', async () => {
     
     const API_GET_CHANNELS = '/api/getChannels';
@@ -13,8 +15,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const searchContainer = document.getElementById("search-container");
     const searchToggle = document.getElementById("search-toggle");
     const searchInput = document.getElementById("search-input");
+    
     const channelListingsContainer = document.querySelector(".channel-list");
-    const spinner = document.getElementById("spinner");
+    const channelSkeleton = document.getElementById("channel-skeleton");
+    
     const loadMoreContainer = document.getElementById("load-more-container");
     const loadMoreBtn = document.getElementById("load-more-btn");
     const channelHeader = document.getElementById("channel-list-header") || document.querySelector(".section-header h2"); 
@@ -211,15 +215,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     async function fetchChannels() {
-        spinner.style.display = 'flex';
         try {
             const response = await fetch(API_GET_CHANNELS);
             const channels = await response.json();
-            spinner.style.display = 'none';
             return channels;
         } catch (error) {
             console.error(error);
-            spinner.style.display = 'none';
             return [];
         }
     }
@@ -298,6 +299,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     allStreams = await fetchChannels();
     currentFilteredStreams = [...allStreams];
+    
+    if(channelSkeleton) channelSkeleton.style.display = 'none';
+    channelListingsContainer.style.display = 'flex';
+    
     renderChannels(true);
 
     const urlParams = new URLSearchParams(window.location.search);
