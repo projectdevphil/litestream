@@ -214,6 +214,7 @@ header nav {
     opacity: 0;
     z-index: 1;
     transition: opacity 0.5s ease 1s;
+    border-radius: var(--border-radius);
     --slide-bg: url('');
 }
 
@@ -375,6 +376,7 @@ header nav {
 .skeleton-list-container {
     background-color: var(--card-background);
     border-radius: var(--border-radius);
+    padding: 20px;
     width: 100%;
     height: 2600px; 
     background-image: repeating-linear-gradient(
