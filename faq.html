@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>FAQ - Litestream</title>
+    <meta name="theme-color" content="#000000">
+    <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="shortcut icon" href="/assets/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Litestream" />
+    <link rel="manifest" href="/assets/site.webmanifest" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/static.css">
+</head>
+<body>
+    <div class="static-page-container">
+        <header class="static-header">
+            <a href="/home" class="back-button" aria-label="Back to Litestream">
+                <span class="material-symbols-rounded">arrow_back</span>
+            </a>
+            <h1>Frequently Asked Questions</h1>
+        </header>
+
+        <main class="content-card">
+            <section>
+                <p>Welcome to the Litestream Help Center. Here you will find answers to common inquiries regarding our service, troubleshooting playback issues, and general usage guidelines. We hope this helps clarify how our free streaming platform operates.</p>
+                
+                <hr>
+
+                <h3>Is Litestream free to use?</h3>
+                <p>Yes, Litestream is 100% free. We believe in providing open access to information and entertainment for Filipinos without subscription fees.</p>
+
+                <hr>
+
+                <h3>Why is a channel buffering or not loading?</h3>
+                <p>Buffering is usually caused by a slow internet connection or high traffic on the source server. Since we do not host the streams, we cannot control the quality or stability of the source broadcast. Try refreshing the page or selecting a different channel.</p>
+
+                <hr>
+
+                <h3>Do I need to register an account?</h3>
+                <p>No registration is required. You can simply visit the website and start watching immediately.</p>
+
+                <hr>
+
+                <h3>Can I request a specific channel?</h3>
+                <p>You can send suggestions via our feedback channels on PHCorner, but please note that we can only add channels that have publicly available stream URLs.</p>
+
+                <hr>
+
+                <h3>Is this legal?</h3>
+                <p>Litestream strictly operates as a directory for publicly accessible links found on the internet. We do not host or pirate content. Please review our <a href="/home/terms">Terms of Service</a> and Disclaimer for more details.</p>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const protectedElements = document.querySelectorAll('.back-button, img, a');
+            protectedElements.forEach(el => {
+                el.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    return false;
+                });
+            });
+
+            const header = document.querySelector(".static-header");
+            window.addEventListener("scroll", () => {
+                if(header) {
+                    header.classList.toggle("scrolled", window.scrollY > 10);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>About Us - Litestream</title>
+    <meta name="theme-color" content="#000000">
+    <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="shortcut icon" href="/assets/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Litestream" />
+    <link rel="manifest" href="/assets/site.webmanifest" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/static.css">
+</head>
+<body>
+    <div class="static-page-container">
+        <header class="static-header">
+            <a href="/home" class="back-button" aria-label="Back to Litestream">
+                <span class="material-symbols-rounded">arrow_back</span>
+            </a>
+            <h1>About Us</h1>
+        </header>
+
+        <main class="content-card">
+            <section>
+                <h2>About Litestream</h2>
+                <p>Litestream is a free IPTV streaming service dedicated to providing Filipinos accessible entertainment, news, and media from anywhere in the world. We aim to bridge the gap between viewers and content by aggregating publicly available live TV channels into one simple, user-friendly interface.</p>
+                <p>Whether you are at home or abroad, Litestream ensures you stay connected with your favorite local programs without the need for expensive subscriptions or complex setups.</p>
+            </section>
+            
+            <hr>
+
+            <section>
+                <h2>Disclaimer</h2>
+                <p>Litestream acts solely as a search engine and aggregator for publicly available streaming URLs. We do not host, upload, or maintain any video files, streams, or media content on our servers. All content found on this platform is hosted by third-party servers and is the property of their respective owners.</p>
+                <p>We have no control over the content, accuracy, or availability of these streams. If you are a copyright owner and believe your content is being used improperly, please contact the hosting provider directly. Usage of this platform is for educational and personal entertainment purposes only.</p>
+            </section>
+            
+            <hr>
+
+            <section class="text-center">
+                <h2>Follow Us</h2>
+                <p>Stay connected and follow the project's progress on our primary platforms. We actively share updates and engage with the community on both GitHub and PHCorner.</p>
+                <div class="social-icon-links">
+                    <a href="https://github.com/projectdevphil" target="_blank" rel="noopener noreferrer" aria-label="GitHub Profile">
+                        <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub Logo">
+                    </a>
+                    <a href="https://phcorner.org/members/buzzybees.2661880/" target="_blank" rel="noopener noreferrer" aria-label="PHCorner Profile">
+                        <img src="https://phcorner.org/media/icon-96x96-png.72016/full" alt="PHCorner Logo">
+                    </a>
+                </div>
+            </section>
+
+            <hr>
+
+            <section class="developer-section">
+                <h2>Developer</h2>
+                <a href="https://github.com/projectdevphil" target="_blank" rel="noopener noreferrer" title="Visit Project Dev on GitHub">
+                    <img src="/assets/project_dev_logo_(white).svg" alt="Project Dev Logo" class="developer-logo">
+                </a>
+                <p>Project Dev is the creative force and developer behind Litestream. Driven by a passion for streaming technology, our mission is to build practical and accessible tools for the community. We are dedicated to continuous improvement and welcome collaboration to help empower developers and enthusiasts alike.</p>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const protectedElements = document.querySelectorAll('.back-button, .social-icon-links a, .developer-section a, img');
+            protectedElements.forEach(el => {
+                el.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; });
+            });
+
+            const header = document.querySelector(".static-header");
+            window.addEventListener("scroll", () => {
+                header.classList.toggle("scrolled", window.scrollY > 10);
+            });
+        });
+    </script>
+</body>
+</html>

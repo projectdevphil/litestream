@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Updates - Litestream</title>
+    <meta name="theme-color" content="#000000">
+    <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="shortcut icon" href="/assets/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Litestream" />
+    <link rel="manifest" href="/assets/site.webmanifest" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/static.css">
+</head>
+<body>
+    <div class="static-page-container">
+        <header class="static-header">
+            <a href="/home" class="back-button" aria-label="Back to Litestream">
+                <span class="material-symbols-rounded">arrow_back</span>
+            </a>
+            <h1>Updates</h1>
+        </header>
+
+        <main class="content-card">
+            
+            <section>
+                <h2>Channel Advisory <span class="advisory-tag">IMPORTANT</span></h2>
+                <span class="update-date">Posted: December 2, 2025</span>
+                
+                <h3>MTV Live Cessation of Broadcast</h3>
+                <p><strong>MTV Live</strong> channel will permanently cease all broadcast transmission worldwide (excluding the U.S. feed) effective <strong>January 1, 2026</strong>.</p>
+                
+                <p>The final day of programming for MTV Live will be <strong>Tuesday, December 31, 2025</strong>. Following the closure, the channel will be removed from the channel list starting on January 1, 2026.</p>
+                
+                <hr>
+                
+                <p>You can continue to watch other great music programming on these channels:</p>
+                <div class="channel-logos">
+                    <a href="/home?channel=myx" class="channel-logo-link">
+                        <span class="material-symbols-rounded play-icon">sensors</span> MYX
+                    </a>
+                    <a href="/home?channel=vevo-pop" class="channel-logo-link">
+                        <span class="material-symbols-rounded play-icon">sensors</span> VEVO POP
+                    </a>
+                    <a href="/home?channel=mtv-live-(us)" class="channel-logo-link">
+                        <span class="material-symbols-rounded play-icon">sensors</span> MTV LIVE (US)
+                    </a>
+                </div>
+
+                <div class="news-links-container">
+                    <span class="news-links-title">Read more from official sources:</span>
+                    <a href="https://www.bbc.com/news/articles/cdr612yz8p0o" target="_blank" rel="noopener noreferrer" class="news-btn">
+                        <span class="material-symbols-rounded news-icon">public</span> BBC News
+                    </a>
+                    <a href="https://entertainment.inquirer.net/633513/mtv-to-shut-down-some-of-its-music-channels-after-40-years/amp" target="_blank" rel="noopener noreferrer" class="news-btn">
+                        <span class="material-symbols-rounded news-icon">public</span> Inquirer.net
+                    </a>
+                </div>
+            </section>
+
+            <hr>
+
+            <section>
+                <h2>Service Status</h2>
+                <p>All other systems and channels are currently operational.</p>
+
+                <div class="combined-status-box">
+                    <div class="status-header">
+                        <span class="status-dot" id="statusDot"></span>
+                        <span id="statusText">Checking Connection...</span>
+                    </div>
+
+                    <hr class="status-divider">
+
+                    <div class="stream-tips-small">
+                        <span class="material-symbols-rounded tip-icon-small">wifi_tethering</span>
+                        <div>
+                            <strong>Stream Quality Tip:</strong>
+                            Slow internet? Switch to <span class="tip-highlight">360p</span> or <span class="tip-highlight">480p</span>.<br>
+                            Fast internet? Switch to <span class="tip-highlight">720p</span> or <span class="tip-highlight">1080p</span>.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const protectAll = document.querySelectorAll('a, button, img, .channel-logo-link, .news-btn, .combined-status-box');
+            protectAll.forEach(el => {
+                el.addEventListener('contextmenu', (e) => { 
+                    e.preventDefault(); 
+                    return false; 
+                });
+            });
+
+            const header = document.querySelector(".static-header");
+            window.addEventListener("scroll", () => {
+                header.classList.toggle("scrolled", window.scrollY > 10);
+            });
+
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+
+            async function checkSystemStatus() {
+                try {
+                    const response = await fetch(window.location.href, { method: 'HEAD', cache: 'no-store' });
+                    
+                    if (response.ok) {
+                        statusDot.classList.remove('down');
+                        statusDot.classList.add('operational');
+                        statusText.textContent = "All Systems Operational";
+                        statusText.style.color = "#ccc";
+                    } else {
+                        throw new Error('Server error');
+                    }
+                } catch (error) {
+                    statusDot.classList.remove('operational');
+                    statusDot.classList.add('down');
+                    statusText.textContent = "Connection Unstable";
+                    statusText.style.color = "#ff6666";
+                }
+            }
+
+            checkSystemStatus();
+            setInterval(checkSystemStatus, 30000);
+        });
+    </script>
+</body>

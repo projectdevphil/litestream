@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Page Not Found - Litestream</title>
+    <meta name="theme-color" content="#000000">
+    <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="shortcut icon" href="/assets/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Litestream" />
+    <link rel="manifest" href="/assets/site.webmanifest" />
+    <link href="https://fonts.cdnfonts.com/css/br-sonoma" rel="stylesheet">
+    <style>
+        :root {
+            --theme-color: #ffffff; 
+            --background-color: #000000;
+            --text-color: #FFFFFF;
+            --text-secondary: #888888;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'BR Sonoma', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            text-align: center;
+            flex-direction: column;
+            padding: 30px;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .logo {
+            font-weight: 900;
+            font-size: 1.55rem;
+            margin-bottom: 60px;
+            display: block;
+            text-transform: lowercase;
+            letter-spacing: -0.5px;
+        }
+
+        h1 {
+            font-size: 7rem;
+            margin: 0;
+            font-weight: 800;
+            color: var(--theme-color);
+            line-height: 0.9;
+            letter-spacing: -4px;
+        }
+
+        h2 {
+            font-size: 1rem;
+            margin-top: 10px;
+            margin-bottom: 25px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            font-weight: 400;
+            padding: 0 10px;
+        }
+
+        a {
+            display: inline-block;
+            padding: 14px 25px;
+            background-color: var(--theme-color);
+            color: var(--background-color);
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 7rem; }
+            .logo { margin-bottom: 40px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">litestream</div>
+        
+        <h1>404</h1>
+        <h2>Page Not Found</h2>
+        
+        <p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+        
+        <a href="/home" oncontextmenu="return false;">Go to Home</a>
+    </div>
+</body>
+</html>
