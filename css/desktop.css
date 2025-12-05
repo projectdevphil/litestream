@@ -115,6 +115,11 @@
         z-index: 15;
     }
 
+    .content-container .channel-listings,
+    .content-container .section-header, {
+        z-index: 16;
+    }
+    
     .slider {
         overflow: visible;
         box-shadow: -40px 0 100px -20px rgba(0,0,0,0.8); 
