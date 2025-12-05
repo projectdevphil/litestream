@@ -9,13 +9,11 @@
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
     <link rel="shortcut icon" href="/assets/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Litestream" />
     <link rel="manifest" href="/assets/site.webmanifest" />
-    
-    <!-- Icons & Shaka Player -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/shaka-player.ui.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/shaka-player@4.16.9/dist/controls.min.css" rel="stylesheet">
-    
     <link rel="stylesheet" href="/css/style.css">    
     <link rel="stylesheet" href="/css/desktop.css">
 </head>
@@ -64,97 +62,77 @@
             </div>
 
             <div class="content-container">
-                
-                <!-- FEATURED SLIDER SECTION -->
-                <section id="featured-slider" class="featured-slider reveal-on-scroll">
-                    <!-- The Glow Shadow Background -->
-                    <div class="slider-glow-shadow" id="slider-glow"></div>
-
-                    <div class="slider" id="main-slider">
-                         <!-- Slide 1 -->
-                         <div class="slide active" data-color="#7f1d1d">
-                            <img src="https://pql-static.abs-cbn.com/images/batangquiapo.herobg-tv.v3.jpg?im_policy=landscapeHero_tv_hd" alt="FPJ's Batang Quiapo" class="slide-bg">
+                <section id="featured-slider" class="featured-slider">
+                    <div class="slider">
+                         <div class="slide active">
+                            <img src="https://pql-static.abs-cbn.com/images/batangquiapo.herobg-tv.v3.jpg?im_policy=landscapeHero_tv_hd" alt="FPJ's Batang Quiapo" class="slide-bg" onerror="this.style.display='none'">
                             <div class="slide-overlay"></div>
                             <div class="slide-content">
-                                <div class="slide-badge visit-badge">Catch-Up TV • Action</div>
                                 <h2 class="slide-title">FPJ's Batang Quiapo</h2>
-                                <div class="slide-divider"></div>
                                 <p class="slide-description"><strong>MON-FRI | 8PM</strong><br>Kapamilya Channel, A2Z and TV5</p>
+                                <div class="slide-badge visit-badge">Catch-Up TV • Action</div>
                             </div>
                         </div>
-                        
-                        <!-- Slide 2 -->
-                        <div class="slide" data-color="#c2410c">
+                        <div class="slide">
                             <img src="https://occ-0-1763-395.1.nflxso.net/dnm/api/v6/6AYY37jfdO6hpXcMjf9Yu5cnmO0/AAAABQ2QL_Xl927R68dyQNd7mIavq3jzl6TXs2baGhbYVxfZNeMUOlnLsPelcmT2_iKWf0qLeFKMXQd4Dsx57QeHuuO2TS4iIKn3EFKO.webp" alt="ROJA" class="slide-bg">
                             <div class="slide-overlay"></div>
                             <div class="slide-content">
-                                <div class="slide-badge visit-badge">Catch-Up TV • Action</div>
                                 <h2 class="slide-title">ROJA</h2>
-                                <div class="slide-divider"></div>
                                 <p class="slide-description"><strong>MON-FRI | 8:45PM</strong><br>Kapamilya Channel, A2Z and TV5</p>
+                                <div class="slide-badge visit-badge">Catch-Up TV • Action</div>
                             </div> 
                         </div>
-
-                        <!-- Slide 3 -->
-                        <div class="slide" data-color="#1e40af">
+                        <div class="slide">
                             <img src="https://pql-static.abs-cbn.com/images/pbbcelebritycollab.herobg-tv.V4.JPG?im_policy=landscapeHero_tv_hd" alt="PBB Celebrity Collab Edition 2.0" class="slide-bg">
                             <div class="slide-overlay"></div>
                             <div class="slide-content">
-                                <div class="slide-badge visit-badge">Catch-Up TV • Reality</div>
                                 <h2 class="slide-title">PBB Celebrity Collab<br>Edition 2.0</h2>
-                                <div class="slide-divider"></div>
-                                <p class="slide-description"><strong>MON-FRI | 9:40PM</strong><br>GMA7 and PBB Catch-Up Episode</p>
+                                <p class="slide-description"><strong>MON-FRI | 9:40PM<br>SAT | 6:15PM<br>SUN | 10:05PM</strong><br>GMA7 and PBB Catch-Up Episode</p>
+                                <div class="slide-badge visit-badge">Catch-Up TV • Reality</div>
                             </div> 
                         </div>
-
-                        <!-- Slide 4 -->
-                        <div class="slide" data-color="#86198f">
+                        <div class="slide">
                             <img src="https://pql-static.abs-cbn.com/images/itsshowtime.herobg-tv.jpg?im_policy=landscapeHero_tv_fhd" alt="It's Showtime" class="slide-bg">
                             <div class="slide-overlay"></div>
                             <div class="slide-content">
-                                <div class="slide-badge visit-badge">Catch-Up TV • Variety</div>
                                 <h2 class="slide-title">It's Showtime</h2>
-                                <div class="slide-divider"></div>
                                 <p class="slide-description"><strong>MON-SAT | 12NN</strong><br>Kapamilya Channel, A2Z and GMA7</p>
+                                <div class="slide-badge visit-badge">Catch-Up TV • Variety</div>
                             </div>
                         </div>
-
-                        <!-- Slide 5 -->
-                        <a href="/home?channel=nba-tv-philippines" class="slide" data-color="#1d4ed8">
+                        <a href="/home?channel=nba-tv-philippines" class="slide">
                             <img src="https://occ-0-1763-395.1.nflxso.net/dnm/api/v6/6AYY37jfdO6hpXcMjf9Yu5cnmO0/AAAABcFuldBLfH2n_0Wiqx4rnmEyjCmJQdy7hbdu7D3ymqfYkqrDcBbgJt9iNU5EbhBzPmU97xqDUYDip3ZSb1y2AFfJdalF4fmaqnP4.webp" alt="NBA TV Philippines" class="slide-bg">
                             <div class="slide-overlay"></div>
                             <div class="slide-content">
-                                <div class="slide-badge visit-badge">Live</div>
                                 <h2 class="slide-title">NBA TV Philippines</h2>
-                                <div class="slide-divider"></div>
-                                <p class="slide-description"><strong>Sports</strong><br>Watch Now</p>
+                                <p class="slide-description"><strong>Sports</strong></p>
+                                <div class="slide-badge visit-badge">Watch Now</div>
                             </div>
                         </a>
                     </div>
-                    
                     <div class="slider-nav">
-                        <button class="dot active" data-index="0"></button>
-                        <button class="dot" data-index="1"></button>
-                        <button class="dot" data-index="2"></button>
-                        <button class="dot" data-index="3"></button>                       
-                        <button class="dot" data-index="4"></button>                       
+                        <button class="dot active"></button>
+                        <button class="dot"></button>
+                        <button class="dot"></button>
+                        <button class="dot"></button>                       
+                        <button class="dot"></button>                       
                     </div>
                 </section>
         
-                <h2 id="channel-list-header" class="section-header reveal-on-scroll">All Channels</h2>
+                <h2 id="channel-list-header" class="section-header">All Channels</h2>
         
-                <section id="channel-listings" class="channel-listings reveal-on-scroll">
+                <section id="channel-listings" class="channel-listings">
                     <div class="spinner-container" id="spinner">
                         <div class="spinner"></div>
                     </div>
-                    <div class="channel-list" id="channel-list-container"></div>
+                    <div class="channel-list"></div>
                 </section>
         
-                <div id="load-more-container" class="load-more-container reveal-on-scroll">
+                <div id="load-more-container" class="load-more-container">
                     <button id="load-more-btn" class="load-more-btn">Load More</button>
                 </div>
 
-                <footer class="site-footer reveal-on-scroll">
+                <footer class="site-footer">
                     <div class="footer-content">
                         <p class="copyright">©2025 Project Dev, All Rights Reserved.</p>
                         <p class="version">Version 1.0.0 Beta</p>
