@@ -70,8 +70,7 @@
         width: 100%;
         box-sizing: border-box;
         margin-top: auto;
-        padding: 20px;
-        background: linear-gradient(to top, var(--background-color) 20%, transparent);
+        padding: 15px;
         z-index: 11;
     }
 
@@ -82,7 +81,6 @@
         font-size: 0.9rem;
         font-weight: 600;
         gap: 3.5px;
-        margin-right: 0;
     }
     
     .content-container {
