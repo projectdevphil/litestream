@@ -236,12 +236,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             slide.style.setProperty('--slide-bg', `url('${data.image}')`);
 
             slide.innerHTML = `
-                <img src="${data.image}" alt="${data.title}" class="slide-bg">
-                <div class="slide-overlay"></div>
-                <div class="slide-content">
-                    <h2 class="slide-title">${data.title}</h2>
-                    <p class="slide-description">${data.description}</p>
-                    <div class="slide-badge visit-badge">${data.badge}</div>
+                <div class="slide-wipe-wrapper">
+                    <img src="${data.image}" alt="${data.title}" class="slide-bg">
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <h2 class="slide-title">${data.title}</h2>
+                        <p class="slide-description">${data.description}</p>
+                        <div class="slide-badge visit-badge">${data.badge}</div>
+                    </div>
                 </div>
             `;
             sliderWrapper.appendChild(slide);
