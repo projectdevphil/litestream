@@ -1,4 +1,8 @@
 @media (min-width: 1024px) {
+    html {
+        scrollbar-gutter: stable;
+    }
+
     body {
         padding-top: 60px;
         overflow-y: auto;
@@ -95,11 +99,13 @@
 
     .content-container .featured-slider,
     .content-container .category-nav,
-    .content-container .channel-listings {
+    .content-container .channel-listings,
+    .content-container .skeleton-loader-container {
         margin-left: 0;
         margin-right: 0;
         padding-left: 0;
         padding-right: 0;
+        width: 100%;
     }
     
     .content-container .featured-slider {
