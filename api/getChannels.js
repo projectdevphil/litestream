@@ -132,7 +132,8 @@ export default function handler(req, res) {
 
         // Music
         { name: 'MYX', logo: 'https://assets-myxglobal.abs-cbn.com/wp-content/uploads/2022/07/MYX_New_Logo_Web1.png', manifestUri: 'https://d24xfhmhdb6r0q.cloudfront.net/out/v1/e897a7b6414a46019818ee9f2c081c4f/index.mpd', clearKey: { 'f40a52a3ac9b4702bdd5b735d910fd2f': '5ce1bc7f06b494c276252b4d13c90e51' }, group: 'Music' },
-        { name: 'MTV Live', logo: 'https://static.wikia.nocookie.net/logopedia/images/7/7f/MTV_Live_2021.svg', manifestUri: 'https://linearjitp-playback.astro.com.my/dash-wv/linear/5014/default_ott.mpd', clearKey: { '3ac2542a4f7be746633db07647451710': '22f964a6d6927ccdba482e775cdff190' }, group: 'Music' },
+        //{ name: 'MTV Live', logo: 'https://static.wikia.nocookie.net/logopedia/images/7/7f/MTV_Live_2021.svg', manifestUri: 'https://linearjitp-playback.astro.com.my/dash-wv/linear/5014/default_ott.mpd', clearKey: { '3ac2542a4f7be746633db07647451710': '22f964a6d6927ccdba482e775cdff190' }, group: 'Music' },
+        { name: 'MTV Live', logo: 'https://static.wikia.nocookie.net/logopedia/images/7/7f/MTV_Live_2021.svg', manifestUri: 'https://nog-live1-ott.izzigo.tv/4/out/u/dash/MTVLIVEHD/default.mpd', clearKey: { 'acc4581a25ef0cd76f8fd7d826bb2d06': 'bc006e72e9aab57aca8ae75a83e8f20e' }, group: 'Music' },
         { name: 'Vevo Pop', logo: 'https://images.viaway.com/26295749_640.png', manifestUri: 'https://amg00056-amg00056c6-rakuten-uk-3235.playouts.now.amagi.tv/playlist.m3u8', group: 'Music' },    
         { name: 'MTV Live (US)', logo: 'https://static.wikia.nocookie.net/logopedia/images/5/58/MTV_Live_%28orange%29.svg', manifestUri: 'https://fl1.moveonjoy.com/MTV_LIVE/manifest.mpd', group: 'Music' },
 
