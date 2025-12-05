@@ -43,10 +43,14 @@
         <div class="main-container">
             <div id="player-view" class="player-view">
                 <div class="player-header">
-                    <button id="minimize-player-btn" class="icon-link"><span class="material-symbols-rounded">expand_more</span></button>
+                    <button id="minimize-player-btn" class="icon-link">
+                        <span class="material-symbols-rounded">expand_more</span>
+                    </button>
                 </div>
                 
                 <div class="video-player-container" id="video-player-wrapper">
+                    <div id="player-skeleton" class="skeleton-player-box"></div>
+                    
                     <div id="video-container" style="width:100%; height:100%">
                         <video id="video" autoplay playsinline style="width:100%; height:100%"></video>
                     </div>
@@ -57,20 +61,25 @@
                         <h3 id="player-channel-name">Select a Channel</h3>
                         <p id="player-channel-status">Now Playing</p>
                     </div>
-                    <div class="live-indicator"><span class="material-symbols-rounded">sensors</span> LIVE</div>
+                    <div class="live-indicator">
+                        <span id="main-live-icon" class="material-symbols-rounded">sensors</span> LIVE
+                    </div>
                 </div>
             </div>
 
             <div class="content-container">
+                
                 <div id="slider-skeleton" class="featured-slider">
                     <div class="skeleton-slider-box"></div>
                 </div>
+                
                 <section id="featured-slider" class="featured-slider" style="display: none;"></section>
         
                 <h2 id="channel-list-header" class="section-header">All Channels</h2>
         
                 <section id="channel-listings" class="channel-listings">
                     <div id="channel-skeleton" class="skeleton-list-container"></div>
+
                     <div class="channel-list" style="display: none;"></div>
                 </section>
         
@@ -98,7 +107,9 @@
         </div>
         <div class="minimized-player-right">
             <span class="material-symbols-rounded live-sensor-mini">sensors</span>
-            <button id="exit-player-btn" class="icon-link-mini"><span class="material-symbols-rounded">close</span></button>
+            <button id="exit-player-btn" class="icon-link-mini">
+                <span class="material-symbols-rounded">close</span>
+            </button>
         </div>
     </div>
 
