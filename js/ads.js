@@ -1,31 +1,23 @@
 (function() {
-    const AD_PLAYLIST = [
-        {
-            videoUrl: '/assets/ads/112620250001.mp4',
-            linkUrl: 'https://www.netflix.com/ph-en/title/81427990?preventIntent=true'
-        },
-        {
-            videoUrl: '/assets/ads/112720250002.mp4',
-            linkUrl: 'https://www.netflix.com/ph-en/title/81427990?preventIntent=true'
-        },
-        {
-            videoUrl: '/assets/ads/112720250003.mp4',
-            linkUrl: 'https://www.netflix.com/ph-en/title/81427990?preventIntent=true'
-        },
-        {
-            videoUrl: '/assets/ads/112820250004.mp4',
-            linkUrl: 'https://dito.ph/'
-        },
-        {
-            videoUrl: '/assets/ads/120220250005.mp4',
-            linkUrl: '/home/updates'
-        }
-    ];
-
     let adContainer = null;
     let timerDisplay = null;
     let skipBtn = null;
     let visitBtn = null;
+
+    async function fetchAds() {
+        try {
+            const response = await fetch('/api/getAds');
+            if (!response.ok) throw new Error('Failed to load ads');
+            const data = await response.json();
+            if(Array.isArray(data) && data.length > 0) {
+                return data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Ad Fetch Error:", error);
+            return null;
+        }
+    }
 
     function formatTime(seconds) {
         if (!seconds || isNaN(seconds) || seconds < 0) return "0:00";
@@ -71,12 +63,12 @@
             `;
 
             visitBtn = document.createElement("button");
-            visitBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 22px; line-height: 0; font-variation-settings: \'wght\' 500;">open_in_new</span>';
+            visitBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 22px; line-height: 0;">open_in_new</span>';
             visitBtn.style.cssText = btnStyle;
             visitBtn.title = "Visit Link";
             
             skipBtn = document.createElement("button");
-            skipBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 26px; line-height: 0; font-variation-settings: \'wght\' 500;">skip_next</span>';
+            skipBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 26px; line-height: 0;">skip_next</span>';
             skipBtn.style.cssText = btnStyle;
             skipBtn.title = "Skip Ad";
 
@@ -119,7 +111,14 @@
     window.playVideoAd = async function(videoElement, playerWrapper, shakaPlayer, shakaUI, statusCallback) {
         createAdUI(playerWrapper);
 
-        const currentAd = AD_PLAYLIST[Math.floor(Math.random() * AD_PLAYLIST.length)];
+        const adPlaylist = await fetchAds();
+
+        if (!adPlaylist) {
+            console.log("No ads to play.");
+            return;
+        }
+
+        const currentAd = adPlaylist[Math.floor(Math.random() * adPlaylist.length)];
         
         if (shakaPlayer) await shakaPlayer.unload();
         if (shakaUI) shakaUI.setEnabled(false);
@@ -161,13 +160,12 @@
 
             const onSkipClicked = (e) => {
                 if(e) e.stopPropagation();
-                console.log("Ad Skipped by user");
                 finishAd();
             };
 
             const onVisitClicked = (e) => {
                 if(e) e.stopPropagation();
-                if (currentAd.linkUrl) {
+                if (currentAd.linkUrl && currentAd.linkUrl !== '#') {
                     window.open(currentAd.linkUrl, '_blank');
                 }
             };
