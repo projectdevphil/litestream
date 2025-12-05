@@ -201,6 +201,7 @@ header nav {
     background-color: transparent;
     border-radius: var(--border-radius);
     position: relative;
+    overflow: visible; 
 }
 
 .slide {
@@ -212,8 +213,8 @@ header nav {
     left: 0;
     opacity: 0;
     z-index: 1;
-    clip-path: inset(0 0 0 100% round var(--border-radius));
-    transition: opacity 0.5s ease 1s, clip-path 0.1s ease 1s;
+    transition: opacity 0.5s ease 1s;
+    --slide-bg: url('');
 }
 
 .slide::before {
@@ -230,33 +231,47 @@ header nav {
     transition: opacity 1.5s ease;
 }
 
+.slide-wipe-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    clip-path: inset(0 0 0 100% round var(--border-radius));
+    transition: clip-path 0.1s ease 1s;
+}
+
 .slide.active {
     opacity: 1;
     z-index: 5;
-    clip-path: inset(0 0 0 0 round var(--border-radius));
-    transition: clip-path 1.2s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.2s ease;
+    transition: opacity 0.2s ease;
 }
 
 .slide.active::before {
-    opacity: 0.6; 
+    opacity: 0.6;
     transition-delay: 0.2s;
 }
 
+.slide.active .slide-wipe-wrapper {
+    clip-path: inset(0 0 0 0 round var(--border-radius));
+    transition: clip-path 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
 .slide-bg {
-    border-radius: var(--border-radius);
     height: 100%;
+    width: 100%;
     object-fit: cover;
     pointer-events: none;
     position: absolute;
-    width: 100%;
     background: #111;
 }
 
 .slide-overlay {
     background: radial-gradient(circle at top right, transparent 35%, black 100%);
-    border-radius: var(--border-radius);
-    inset: 0;
     position: absolute;
+    inset: 0;
 }
 
 .slide-content {
@@ -273,8 +288,8 @@ header nav {
 .slide.active .slide-content {
     opacity: 1;
     transform: translateY(0);
-    transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-    transition-delay: 0.6s; 
+    transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition-delay: 0.6s;
 }
 
 .slide-title {
@@ -360,7 +375,6 @@ header nav {
 .skeleton-list-container {
     background-color: var(--card-background);
     border-radius: var(--border-radius);
-    margin-top: 15px;
     width: 100%;
     height: 2600px; 
     background-image: repeating-linear-gradient(
@@ -448,6 +462,14 @@ header nav {
 .channel-info-right .material-symbols-rounded {
     color: var(--theme-color);
     font-size: 22px;
+}
+
+.status-offline {
+    color: #ff3b30 !important;
+}
+
+.material-symbols-rounded {
+    transition: color 0.3s ease;
 }
 
 .player-view {
@@ -622,14 +644,6 @@ header nav {
     align-items: center;
     display: flex;
     gap: 10px;
-}
-
-.status-offline {
-    color: #ff3b30 !important;
-}
-
-.material-symbols-rounded {
-    transition: color 0.3s ease;
 }
 
 .site-footer {
