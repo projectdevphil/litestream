@@ -624,6 +624,14 @@ header nav {
     gap: 10px;
 }
 
+.status-offline {
+    color: #ff3b30 !important;
+}
+
+.material-symbols-rounded {
+    transition: color 0.3s ease;
+}
+
 .site-footer {
     color: #666;
     margin-top: 40px;
