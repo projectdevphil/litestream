@@ -27,8 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const playerView = document.getElementById('player-view');
     const videoElement = document.getElementById('video');
-    const playerWrapper = document.getElementById('video-container'); 
-    const playerSkeleton = document.getElementById('player-skeleton');
+    const playerWrapper = document.getElementById('video-container');
 
     const minimizeBtn = document.getElementById('minimize-player-btn');
     const minimizedPlayer = document.getElementById('minimized-player');
@@ -375,7 +374,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 
                 updateOfflineState(true); 
-                if(playerSkeleton) playerSkeleton.style.display = 'none'; 
             });
             return true;
         } else {
@@ -400,8 +398,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.body.classList.add('no-scroll');
             if (minimizedPlayer) minimizedPlayer.classList.remove('active');
         }
-
-        if(playerSkeleton && window.innerWidth > 1024) playerSkeleton.style.display = 'block';
 
         updateOfflineState(offlineChannels.has(currentActiveChannelSlug));
         
@@ -455,8 +451,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             await player.load(secureData.manifestUri);
             videoElement.play().catch(() => console.log("Stream Auto-play blocked"));
             
-            if(playerSkeleton) playerSkeleton.style.display = 'none';
-            
             offlineChannels.delete(currentActiveChannelSlug);
             updateOfflineState(false); 
             if(mainPlayerStatus) mainPlayerStatus.textContent = groupTitle;
@@ -465,7 +459,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error(e);
             offlineChannels.add(currentActiveChannelSlug);
             updateOfflineState(true);
-            if(playerSkeleton) playerSkeleton.style.display = 'none';
         }
     };
 
@@ -491,7 +484,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(playerView) playerView.classList.remove('active');
         if(minimizedPlayer) minimizedPlayer.classList.remove('active');
         document.body.classList.remove('no-scroll');
-        if(playerSkeleton) playerSkeleton.style.display = 'none';
 
         if(currentActiveChannelSlug) {
             const listIcon = document.getElementById(`sensor-${currentActiveChannelSlug}`);
