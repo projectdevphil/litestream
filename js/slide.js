@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const sliderContainer = document.getElementById('featured-slider');
+    const skeletonContainer = document.getElementById('slider-skeleton');
+    
     if (!sliderContainer) return;
 
     const fetchSlides = async () => {
@@ -15,6 +17,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const renderSlider = (slidesData) => {
+        if (skeletonContainer) skeletonContainer.style.display = 'none';
+        
+        sliderContainer.style.display = 'block';
+
         if (!slidesData || slidesData.length === 0) return;
 
         const sliderWrapper = document.createElement('div');
