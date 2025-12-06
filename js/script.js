@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const BASE_URL_PATH = '/home';
     const POSTER_MOBILE = '/assets/poster/mobile.png';
     const POSTER_DESKTOP = '/assets/poster/desktop.png';
+    const TOP_WATCH_STORAGE_KEY = 'litestream_top_watch_counts';
 
     const header = document.querySelector("header");
     const menuBtn = document.getElementById("menu-btn");
@@ -18,6 +19,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const sliderContainer = document.getElementById('featured-slider');
     const sliderSkeleton = document.getElementById('slider-skeleton');
+
+    const topWatchSection = document.getElementById('top-watch-channels');
+    const topWatchList = document.querySelector('.top-watch-list');
 
     const channelListingsContainer = document.querySelector(".channel-list");
     const channelSkeleton = document.getElementById("channel-skeleton");
@@ -354,6 +358,59 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
+    function trackChannelView(channel) {
+        try {
+            const slug = createSlug(channel.name);
+            let counts = JSON.parse(localStorage.getItem(TOP_WATCH_STORAGE_KEY) || '{}');
+            counts[slug] = (counts[slug] || 0) + 1;
+            localStorage.setItem(TOP_WATCH_STORAGE_KEY, JSON.stringify(counts));
+            renderTopWatch();
+        } catch (e) {
+            console.error("Storage error", e);
+        }
+    }
+
+    function renderTopWatch() {
+        if (!topWatchSection || !topWatchList) return;
+
+        const counts = JSON.parse(localStorage.getItem(TOP_WATCH_STORAGE_KEY) || '{}');
+        const sortedSlugs = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).slice(0, 5);
+
+        if (sortedSlugs.length === 0) {
+            topWatchSection.style.display = 'none';
+            return;
+        }
+
+        topWatchList.innerHTML = '';
+        let hasValidItems = false;
+
+        sortedSlugs.forEach((slug, index) => {
+            const channel = allStreams.find(s => createSlug(s.name) === slug);
+            if (channel) {
+                hasValidItems = true;
+                const item = document.createElement('div');
+                item.className = 'top-watch-item';
+                item.onclick = () => openPlayer(channel);
+                
+                const logo = channel.logo || '/assets/favicon.svg';
+                
+                item.innerHTML = `
+                    <div class="top-rank-number">${index + 1}</div>
+                    <div class="top-watch-logo-container">
+                        <img src="${logo}" class="top-watch-logo" alt="${channel.name}">
+                    </div>
+                `;
+                topWatchList.appendChild(item);
+            }
+        });
+
+        if (hasValidItems) {
+            topWatchSection.style.display = 'block';
+        } else {
+            topWatchSection.style.display = 'none';
+        }
+    }
+
     const initPlayer = async () => {
         shaka.polyfill.installAll();
         if (shaka.Player.isBrowserSupported()) {
@@ -383,6 +440,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const openPlayer = async (publicStreamInfo) => {
+        trackChannelView(publicStreamInfo);
+
         if(currentActiveChannelSlug && !offlineChannels.has(currentActiveChannelSlug)) {
             const prevIcon = document.getElementById(`sensor-${currentActiveChannelSlug}`);
             if(prevIcon) {
@@ -600,6 +659,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     channelListingsContainer.style.display = 'flex';
     
     renderChannels(true);
+    renderTopWatch();
 
     const urlParams = new URLSearchParams(window.location.search);
     const channelSlug = urlParams.get('channel');
