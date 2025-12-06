@@ -49,7 +49,6 @@
                 </div>
                 
                 <div class="video-player-container" id="video-player-wrapper">
-                    
                     <div id="video-container" style="width:100%; height:100%">
                         <video id="video" autoplay playsinline style="width:100%; height:100%"></video>
                     </div>
@@ -76,10 +75,19 @@
                 <section id="top-watch-channels" class="top-watch-section">
                     <div class="top-watch-header">Top 5 Watched Channels</div>
                     
-                    <div id="top-watch-skeleton" class="top-watch-skeleton-container">
-                        <div class="skeleton-card"></div>
-                        <div class="skeleton-card"></div>
-                        <div class="skeleton-card"></div>
+                    <div id="top-watch-skeleton" class="top-watch-skeleton-container" style="display: flex;">
+                        <div class="skeleton-card-wrapper">
+                            <div class="skeleton-rank"></div>
+                            <div class="skeleton-card"></div>
+                        </div>
+                        <div class="skeleton-card-wrapper">
+                            <div class="skeleton-rank"></div>
+                            <div class="skeleton-card"></div>
+                        </div>
+                        <div class="skeleton-card-wrapper">
+                            <div class="skeleton-rank"></div>
+                            <div class="skeleton-card"></div>
+                        </div>
                     </div>
 
                     <div class="top-watch-list" style="display: none;">
