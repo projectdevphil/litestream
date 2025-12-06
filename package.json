@@ -1,3 +1,5 @@
 {
-  "type": "module"
+  "dependencies": {
+    "@upstash/redis": "latest"
+  }
 }
