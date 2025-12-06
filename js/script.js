@@ -1,14 +1,17 @@
 document.addEventListener('DOMContentLoaded', async () => {
     
+    // API Endpoints
     const API_GET_CHANNELS = '/api/getChannels';
     const API_GET_DATA = '/api/getData';
     const API_GET_SLIDES = '/api/getSlides';
     const API_GET_ADS = '/api/getAds';
+    const API_INCREMENT_VIEW = '/api/incrementView'; // New
+    const API_GET_TOP_CHANNELS = '/api/getTopChannels'; // New
+
     const CHANNELS_PER_PAGE = 40;
     const BASE_URL_PATH = '/home';
     const POSTER_MOBILE = '/assets/poster/mobile.png';
     const POSTER_DESKTOP = '/assets/poster/desktop.png';
-    const TOP_WATCH_STORAGE_KEY = 'litestream_top_watch_counts';
 
     const header = document.querySelector("header");
     const menuBtn = document.getElementById("menu-btn");
@@ -22,6 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const topWatchSection = document.getElementById('top-watch-channels');
     const topWatchList = document.querySelector('.top-watch-list');
+    const topWatchSkeleton = document.getElementById('top-watch-skeleton');
 
     const channelListingsContainer = document.querySelector(".channel-list");
     const channelSkeleton = document.getElementById("channel-skeleton");
@@ -358,55 +362,67 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    function trackChannelView(channel) {
+    // --- NEW: Send view to Vercel KV ---
+    async function trackChannelView(channel) {
         try {
             const slug = createSlug(channel.name);
-            let counts = JSON.parse(localStorage.getItem(TOP_WATCH_STORAGE_KEY) || '{}');
-            counts[slug] = (counts[slug] || 0) + 1;
-            localStorage.setItem(TOP_WATCH_STORAGE_KEY, JSON.stringify(counts));
-            renderTopWatch();
+            // Fire and forget, don't await response to speed up UI
+            fetch(`${API_INCREMENT_VIEW}?channel=${slug}`);
         } catch (e) {
-            console.error("Storage error", e);
+            console.error("Tracking error", e);
         }
     }
 
-    function renderTopWatch() {
+    // --- NEW: Fetch Global Top 5 from Vercel KV ---
+    async function renderTopWatch() {
         if (!topWatchSection || !topWatchList) return;
 
-        const counts = JSON.parse(localStorage.getItem(TOP_WATCH_STORAGE_KEY) || '{}');
-        const sortedSlugs = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).slice(0, 5);
-
-        if (sortedSlugs.length === 0) {
-            topWatchSection.style.display = 'none';
-            return;
+        // Show Skeleton initially
+        if(topWatchSkeleton && topWatchList.style.display === 'none') {
+            topWatchSkeleton.style.display = 'flex';
         }
 
-        topWatchList.innerHTML = '';
-        let hasValidItems = false;
+        try {
+            // Fetch list of slugs ['cnn', 'abc', ...]
+            const res = await fetch(API_GET_TOP_CHANNELS);
+            const topSlugs = await res.json();
 
-        sortedSlugs.forEach((slug, index) => {
-            const channel = allStreams.find(s => createSlug(s.name) === slug);
-            if (channel) {
-                hasValidItems = true;
-                const item = document.createElement('div');
-                item.className = 'top-watch-item';
-                item.onclick = () => openPlayer(channel);
-                
-                const logo = channel.logo || '/assets/favicon.svg';
-                
-                item.innerHTML = `
-                    <div class="top-rank-number">${index + 1}</div>
-                    <div class="top-watch-logo-container">
-                        <img src="${logo}" class="top-watch-logo" alt="${channel.name}">
-                    </div>
-                `;
-                topWatchList.appendChild(item);
+            // Hide skeleton
+            if(topWatchSkeleton) topWatchSkeleton.style.display = 'none';
+            
+            if (!Array.isArray(topSlugs) || topSlugs.length === 0) {
+                topWatchSection.style.display = 'none';
+                return;
             }
-        });
 
-        if (hasValidItems) {
+            topWatchList.style.display = 'flex';
             topWatchSection.style.display = 'block';
-        } else {
+            topWatchList.innerHTML = '';
+
+            topSlugs.forEach((slug, index) => {
+                // Find full channel details from the main list
+                const channel = allStreams.find(s => createSlug(s.name) === slug);
+                if (channel) {
+                    const item = document.createElement('div');
+                    item.className = 'top-watch-item';
+                    item.onclick = () => openPlayer(channel);
+                    
+                    const logo = channel.logo || '/assets/favicon.svg';
+                    
+                    // Design: Number overlaps card
+                    item.innerHTML = `
+                        <div class="top-rank-number">${index + 1}</div>
+                        <div class="top-watch-logo-container">
+                            <img src="${logo}" class="top-watch-logo" alt="${channel.name}">
+                        </div>
+                    `;
+                    topWatchList.appendChild(item);
+                }
+            });
+
+        } catch (e) {
+            console.error("Failed to load top channels:", e);
+            if(topWatchSkeleton) topWatchSkeleton.style.display = 'none';
             topWatchSection.style.display = 'none';
         }
     }
@@ -440,6 +456,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const openPlayer = async (publicStreamInfo) => {
+        // Track the view globally
         trackChannelView(publicStreamInfo);
 
         if(currentActiveChannelSlug && !offlineChannels.has(currentActiveChannelSlug)) {
@@ -659,6 +676,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     channelListingsContainer.style.display = 'flex';
     
     renderChannels(true);
+
+    // Call Global Top Watch (it will wait for API)
     renderTopWatch();
 
     const urlParams = new URLSearchParams(window.location.search);
