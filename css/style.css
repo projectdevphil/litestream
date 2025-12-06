@@ -393,7 +393,7 @@ header nav {
 .top-watch-section {
     padding: 0 20px;
     margin-top: 30px;
-    display: block;
+    display: block; 
     position: relative;
     min-height: 150px;
 }
@@ -406,10 +406,9 @@ header nav {
 
 .top-watch-list {
     display: flex;
-    gap: 15px; 
+    gap: 40px;
     overflow-x: auto;
     padding-bottom: 15px;
-    padding-left: 20px; 
     -ms-overflow-style: none;
     scrollbar-width: none;
     align-items: center;
@@ -421,12 +420,11 @@ header nav {
 
 .top-watch-item {
     display: flex;
-    position: relative;
+    align-items: flex-end;
+    gap: 12px;
     flex-shrink: 0;
     cursor: pointer;
     transition: transform 0.2s ease;
-    margin-left: 10px;
-    z-index: 2;
 }
 
 .top-watch-item:hover {
@@ -434,22 +432,20 @@ header nav {
 }
 
 .top-rank-number {
-    font-size: 4rem; 
-    font-weight: 900;
-    font-style: italic;
-    line-height: 1;
-    position: absolute;
-    bottom: -15px;
-    left: -20px;
-    z-index: -1;
-    background: linear-gradient(to bottom, #ffffff 30%, var(--card-background) 90%);
+    font-size: 6rem;
+    font-weight: 800;
+    font-style: normal;
+    line-height: 0.85;
+    background: linear-gradient(to bottom, #ffffff 40%, #444444 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     color: transparent;
     
     font-family: 'BR Sonoma', sans-serif;
-    pointer-events: none;
+    margin-bottom: -5px;
+    min-width: 40px;
+    text-align: right;
 }
 
 .top-watch-logo-container {
@@ -464,35 +460,37 @@ header nav {
     border: 1px solid rgba(255,255,255,0.08);
     overflow: hidden;
     position: relative;
-    padding: 15px;
-    z-index: 2;
+    padding: 10px; 
 }
 
 .top-watch-logo {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    filter: grayscale(100%);
-    opacity: 0.8;
-    transition: all 0.3s ease;
-}
-
-.top-watch-item:hover .top-watch-logo {
-    filter: grayscale(0%);
+    object-fit: contain; 
+    filter: none;
     opacity: 1;
 }
 
 .top-watch-skeleton-container {
     display: flex;
-    gap: 30px;
+    gap: 40px;
     overflow-x: hidden;
-    padding-left: 30px;
     margin-bottom: 20px;
 }
 
-.skeleton-card-wrapper {
-    position: relative;
+.skeleton-item {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
     flex-shrink: 0;
+}
+
+.skeleton-rank-number {
+    width: 40px;
+    height: 70px;
+    background-color: #2a2a2a;
+    border-radius: 4px;
+    animation: skeleton-pulse 1.5s infinite ease-in-out;
 }
 
 .skeleton-card {
@@ -501,18 +499,6 @@ header nav {
     background-color: var(--card-background);
     border-radius: 12px;
     animation: skeleton-pulse 1.5s infinite ease-in-out;
-}
-
-.skeleton-rank {
-    position: absolute;
-    bottom: -10px;
-    left: -20px;
-    width: 40px;
-    height: 60px;
-    background-color: #2a2a2a;
-    mask-image: linear-gradient(to bottom, black, transparent);
-    -webkit-mask-image: linear-gradient(to bottom, black, transparent);
-    z-index: -1;
 }
 
 .section-header {
