@@ -1,12 +1,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
     
-    // API Endpoints
     const API_GET_CHANNELS = '/api/getChannels';
     const API_GET_DATA = '/api/getData';
     const API_GET_SLIDES = '/api/getSlides';
     const API_GET_ADS = '/api/getAds';
-    const API_INCREMENT_VIEW = '/api/incrementView'; // New
-    const API_GET_TOP_CHANNELS = '/api/getTopChannels'; // New
+    const API_INCREMENT_VIEW = '/api/incrementView'; 
+    const API_GET_TOP_CHANNELS = '/api/getTopChannels'; 
 
     const CHANNELS_PER_PAGE = 40;
     const BASE_URL_PATH = '/home';
@@ -362,32 +361,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    // --- NEW: Send view to Vercel KV ---
     async function trackChannelView(channel) {
         try {
             const slug = createSlug(channel.name);
-            // Fire and forget, don't await response to speed up UI
             fetch(`${API_INCREMENT_VIEW}?channel=${slug}`);
         } catch (e) {
             console.error("Tracking error", e);
         }
     }
 
-    // --- NEW: Fetch Global Top 5 from Vercel KV ---
     async function renderTopWatch() {
         if (!topWatchSection || !topWatchList) return;
 
-        // Show Skeleton initially
-        if(topWatchSkeleton && topWatchList.style.display === 'none') {
+        if(topWatchSkeleton && topWatchList.innerHTML === '') {
             topWatchSkeleton.style.display = 'flex';
+            topWatchList.style.display = 'none';
         }
 
         try {
-            // Fetch list of slugs ['cnn', 'abc', ...]
             const res = await fetch(API_GET_TOP_CHANNELS);
             const topSlugs = await res.json();
 
-            // Hide skeleton
             if(topWatchSkeleton) topWatchSkeleton.style.display = 'none';
             
             if (!Array.isArray(topSlugs) || topSlugs.length === 0) {
@@ -396,11 +390,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             topWatchList.style.display = 'flex';
-            topWatchSection.style.display = 'block';
+
             topWatchList.innerHTML = '';
 
             topSlugs.forEach((slug, index) => {
-                // Find full channel details from the main list
                 const channel = allStreams.find(s => createSlug(s.name) === slug);
                 if (channel) {
                     const item = document.createElement('div');
@@ -409,7 +402,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     
                     const logo = channel.logo || '/assets/favicon.svg';
                     
-                    // Design: Number overlaps card
                     item.innerHTML = `
                         <div class="top-rank-number">${index + 1}</div>
                         <div class="top-watch-logo-container">
@@ -423,6 +415,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) {
             console.error("Failed to load top channels:", e);
             if(topWatchSkeleton) topWatchSkeleton.style.display = 'none';
+            // Hide section if error
             topWatchSection.style.display = 'none';
         }
     }
@@ -456,7 +449,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const openPlayer = async (publicStreamInfo) => {
-        // Track the view globally
         trackChannelView(publicStreamInfo);
 
         if(currentActiveChannelSlug && !offlineChannels.has(currentActiveChannelSlug)) {
@@ -677,7 +669,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     renderChannels(true);
 
-    // Call Global Top Watch (it will wait for API)
     renderTopWatch();
 
     const urlParams = new URLSearchParams(window.location.search);
