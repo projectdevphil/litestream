@@ -1,0 +1,96 @@
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: normal;
+    font-weight: 400;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-Regular-BF654c45266c042.woff') format('woff');
+}
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: italic;
+    font-weight: 400;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-RegularItalic-BF654c452681c11.woff') format('woff');
+}
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: normal;
+    font-weight: 250;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-Thin-BF654c45255ffe0.woff') format('woff');
+}
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: italic;
+    font-weight: 250;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-ThinItalic-BF654c45268d3f9.woff') format('woff');
+}
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: normal;
+    font-weight: 260;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-ExtraLight-BF654c45265af8d.woff') format('woff');
+}
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: italic;
+    font-weight: 260;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-ExtraLightItalic-BF654c4525a5046.woff') format('woff');
+}
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: normal;
+    font-weight: 300;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-Light-BF654c452608e0f.woff') format('woff');
+}
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: italic;
+    font-weight: 300;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-LightItalic-BF654c45266aa83.woff') format('woff');
+}
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: normal;
+    font-weight: 500;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-Medium-BF654c45266edd1.woff') format('woff');
+}
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: italic;
+    font-weight: 500;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-MediumItalic-BF654c45267d45f.woff') format('woff');
+}
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: normal;
+    font-weight: 600;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-SemiBold-BF654c45268c340.woff') format('woff');
+}
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: italic;
+    font-weight: 600;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-SemiBoldItalic-BF654c452696350.woff') format('woff');
+}
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: normal;
+    font-weight: 700;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-Bold-BF654c4526823f5.woff') format('woff');
+}
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: italic;
+    font-weight: 700;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-BoldItalic-BF654c4525c9c27.woff') format('woff');
+}
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: normal;
+    font-weight: 900;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-Black-BF654c4525506bf.woff') format('woff');
+}
+@font-face {
+    font-family: 'BR Sonoma';
+    font-style: italic;
+    font-weight: 900;
+    src: local('BR Sonoma'), url('/assets/fonts/BRSonoma-BlackItalic-BF654c45268988e.woff') format('woff');
+}
