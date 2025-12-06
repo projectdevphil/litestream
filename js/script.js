@@ -361,6 +361,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
+    // --- Send view to Vercel KV ---
     async function trackChannelView(channel) {
         try {
             const slug = createSlug(channel.name);
@@ -370,9 +371,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // --- Fetch Global Top 5 ---
     async function renderTopWatch() {
         if (!topWatchSection || !topWatchList) return;
 
+        // Ensure Skeleton is shown if no data yet
         if(topWatchSkeleton && topWatchList.innerHTML === '') {
             topWatchSkeleton.style.display = 'flex';
             topWatchList.style.display = 'none';
@@ -415,7 +418,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) {
             console.error("Failed to load top channels:", e);
             if(topWatchSkeleton) topWatchSkeleton.style.display = 'none';
-            // Hide section if error
             topWatchSection.style.display = 'none';
         }
     }
